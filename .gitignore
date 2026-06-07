@@ -1,0 +1,22 @@
+# ── Python ──
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# ── VibeGraph 로컬/생성 파일 ──
+# 채점 데이터는 기본적으로 ~/.vibegraph 에 저장되므로 저장소에 포함되지 않습니다.
+# 아래는 혹시 코드 폴더에 생길 수 있는 로컬 산출물 방지용입니다.
+.current_session.json
+.migrated_to_userdir
+_설치완료_OK.txt
+index.html
+growth.html
+
+# 구버전 방식으로 코드 폴더에 데이터가 쌓였을 경우(프로젝트/YYYYMMDD_* 작업 폴더)
+*/20*/
+
+# ── OS ──
+Thumbs.db
+.DS_Store
