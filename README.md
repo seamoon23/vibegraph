@@ -119,13 +119,6 @@ vibe install-skill
 `~/.claude/commands/vibe.md` 파일을 생성합니다. 이후 **VS Code를 완전히 재시작**하면
 Claude Code 창에서 `/vibe` 슬래시 명령을 사용할 수 있습니다.
 
-> ⚠️ **bat 방식 사용자 주의**: `C:\vibegraph\vibe.py`(설치 위치)와
-> `C:\Users\...\git\vibegraph\vibe.py`(저장소)가 별개로 존재합니다.
-> git pull 후 vibe.py가 업데이트되면 설치 위치에도 복사해야 합니다:
-> ```powershell
-> Copy-Item "C:\Users\seamo\git\vibegraph\vibe.py" "C:\vibegraph\vibe.py" -Force
-> ```
-
 ## 🧭 기본 사용법
 
 ### 터미널 방식
@@ -158,7 +151,7 @@ vibe end                         # 리포트(report.html) 생성 + 조회/성장
 | `vibe dashboard` | 전체 작업 조회 페이지 (= `view`, `index`) |
 | `vibe growth` | 성장 리포트 — 기본 **최근 2주** (`--all` 전체 · `--weeks N` · `--project <이름>`) |
 | `vibe coach` | 누적 신호 기반 코칭 프롬프트 복사 |
-| `vibe install-skill` | Claude Code Skill 파일 설치 (`~/.claude/skills/vibe.md`) |
+| `vibe install-skill` | Claude Code 슬래시 명령 설치 (`~/.claude/commands/vibe.md`) |
 
 > ⏱ **성장 리포트 기본 기간이 "최근 2주"인 이유**: 전체를 기본으로 하면 작업이 쌓일수록 집계가 느려지고 추세 차트가 복잡해집니다. 전체 흐름은 `vibe growth --all` 로 확인하세요.
 

@@ -16,7 +16,7 @@ Usage:
   vibe dashboard                - 전체 작업 조회 페이지(index.html) 생성/열기
   vibe growth                   - 누적 성장 리포트(growth.html) 생성/열기
   vibe coach                    - 누적 신호 기반 코칭 프롬프트 복사 (Claude창에서 코칭)
-  vibe install-skill            - Claude Code Skill 파일 설치 (~/.claude/skills/vibe.md)
+  vibe install-skill            - Claude Code 슬래시 명령 설치 (~/.claude/commands/vibe.md)
 
 채점은 '작업하던 Claude Code 창'에서 이뤄진다(Pro 구독으로 커버).
 이 CLI는 폴더 정리·HTML 생성·통계만 담당하며 외부 API를 호출하지 않는다.
@@ -1607,7 +1607,7 @@ def main():
 
     pis = sub.add_parser(
         "install-skill",
-        help="Claude Code Skill 파일을 ~/.claude/skills/vibe.md 에 설치")
+        help="Claude Code 슬래시 명령을 ~/.claude/commands/vibe.md 에 설치")
     pis.add_argument("--force", action="store_true", help="기존 파일 덮어쓰기")
 
     ROOT.mkdir(parents=True, exist_ok=True)
