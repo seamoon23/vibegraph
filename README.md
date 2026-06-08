@@ -68,17 +68,19 @@ result.json 에 JSON 저장 ◀──────────┘
 vibe end    ──▶ report.html · index.html · growth.html 생성
 ```
 
-**방식 B — 자동 (Claude Code Skill 등록 후)**
+**방식 B — 자동 (슬래시 명령 등록 후, Claude Code 창에서)**
 
 ```
-[채점할 대화 창에서만]
+[채점할 대화 창에서]
 
-/vibe start <project> <task>   ← 세션 시작
+/vibe start <project> <task>   ← 세션 시작 (PowerShell로 vibe start 실행)
 /vibe report                   ← Claude가 이 대화를 직접 채점 + report.html 자동 생성
 ```
 
 방식 B는 클립보드·붙여넣기·JSON 저장 없이 두 줄로 완결됩니다.
 소급 채점도 동일 방식 — 이미 끝난 대화에서 start → report 바로 실행 가능.
+
+> ℹ️ `/vibe` 명령은 내부적으로 PowerShell을 통해 Windows의 `vibe` 명령을 호출합니다.
 
 ## 📦 요구 사항
 
@@ -106,7 +108,7 @@ git clone https://github.com/seamoon23/vibegraph.git
 
 > 💡 설치 후 `vibe` 가 "인식되지 않습니다"라고 나오면, **VS Code를 완전히 종료 후 재실행**하거나 **새 PowerShell 창**을 여세요.
 
-### 🤖 Claude Code Skill 등록 (선택)
+### 🤖 Claude Code 슬래시 명령 등록 (선택)
 
 > pip 설치든 bat 설치든 동일하게 진행합니다.
 
@@ -114,7 +116,15 @@ git clone https://github.com/seamoon23/vibegraph.git
 vibe install-skill
 ```
 
-이후 **VS Code를 완전히 재시작**하면 Claude Code 창에서 `/vibe` 명령을 사용할 수 있습니다.
+`~/.claude/commands/vibe.md` 파일을 생성합니다. 이후 **VS Code를 완전히 재시작**하면
+Claude Code 창에서 `/vibe` 슬래시 명령을 사용할 수 있습니다.
+
+> ⚠️ **bat 방식 사용자 주의**: `C:\vibegraph\vibe.py`(설치 위치)와
+> `C:\Users\...\git\vibegraph\vibe.py`(저장소)가 별개로 존재합니다.
+> git pull 후 vibe.py가 업데이트되면 설치 위치에도 복사해야 합니다:
+> ```powershell
+> Copy-Item "C:\Users\seamo\git\vibegraph\vibe.py" "C:\vibegraph\vibe.py" -Force
+> ```
 
 ## 🧭 기본 사용법
 
