@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vibegraph"
+version = "0.4.0"
+description = "바이브코딩 대화 순도 분석 CLI"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+keywords = ["vibe-coding", "prompt-engineering", "cli", "claude-code"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Environment :: Console",
+]
+
+[project.scripts]
+vibe = "vibe:main"
+
+[tool.setuptools]
+py-modules = ["vibe"]

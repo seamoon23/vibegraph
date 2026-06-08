@@ -4,15 +4,19 @@ VibeGraph - 바이브코딩 대화 순도 분석 CLI  (API 키 불필요)
 Usage:
   vibe start <project> <task>   - 새 작업 세션 시작
   vibe prompt                   - 채점 프롬프트 복사 + result.json 열기
+  vibe report                   - result.json 있으면 리포트 생성, 없으면 프롬프트 복사
+                                  (Claude Code 창에서 /vibe report → 현재 대화 자동 채점)
   vibe end [--file <path>]      - result.json 으로 리포트 생성
   vibe list [<project>]         - 세션 목록 조회
   vibe stats [--weeks <n>]      - 기간별 통계 요약
   vibe dashboard                - 전체 작업 조회 페이지(index.html) 생성/열기
   vibe growth                   - 누적 성장 리포트(growth.html) 생성/열기
   vibe coach                    - 누적 신호 기반 코칭 프롬프트 복사 (Claude창에서 코칭)
+  vibe install-skill            - Claude Code Skill 파일 설치 (~/.claude/skills/vibe.md)
 
 채점은 '작업하던 Claude Code 창'에서 이뤄진다(Pro 구독으로 커버).
 이 CLI는 폴더 정리·HTML 생성·통계만 담당하며 외부 API를 호출하지 않는다.
+설치: pip install git+https://github.com/seamoon23/vibegraph.git
 """
 
 import os
@@ -183,6 +187,122 @@ Java 레거시(1.6~1.8) + Spring + MyBatis + Oracle/MariaDB/Cubrid + Tomcat/JEUS
 """
 
 
+# ── Skill 파일 (vibe install-skill → ~/.claude/skills/vibe.md) ─────────────────
+SKILL_CONTENT = """\
+---
+name: vibe
+description: VibeGraph 바이브코딩 채점. /vibe start <proj> <task>로 세션 시작, /vibe report로 현재 대화를 자동 채점해 HTML 리포트 완결. 소급 채점(이미 끝난 대화에서도 동작) 지원.
+---
+
+# VibeGraph Skill
+
+사용자가 `/vibe <subcommand> [args]`를 입력하면 아래 규칙대로 처리한다.
+
+---
+
+## 일반 명령어 — CLI 위임
+
+아래 명령어는 Bash 도구로 그대로 실행하고 출력을 보여준다:
+
+- `/vibe start <project> <task>` → `vibe start <project> <task>`
+- `/vibe end` → `vibe end`
+- `/vibe list [project]` → `vibe list [project]`
+- `/vibe stats [--weeks N]` → `vibe stats [--weeks N]`
+- `/vibe dashboard` → `vibe dashboard`
+- `/vibe growth [--all] [--weeks N] [--project X]` → `vibe growth [해당 옵션]`
+- `/vibe coach` → `vibe coach`
+
+---
+
+## /vibe report — 현재 대화 자동 채점 + 리포트 생성
+
+**핵심 명령어. 현재 컨텍스트의 대화 전체를 Claude가 직접 채점한다.**
+소급 채점 지원: 이미 끝난 대화에서 `/vibe start` 직후 `/vibe report`를 실행해도 동작한다.
+
+### Step 1 — 세션 확인
+
+```bash
+python -c "
+import os
+from pathlib import Path
+root = Path(os.environ.get('VIBE_HOME') or os.environ.get('VIBEFIX_HOME') or str(Path.home() / '.vibegraph'))
+sf = Path(root) / '.current_session.json'
+print(sf.read_text(encoding='utf-8') if sf.exists() else 'NO_SESSION')
+"
+```
+
+출력이 `NO_SESSION`이면 → "세션 없음. `/vibe start <project> <task>` 를 먼저 실행하세요." 안내 후 종료.
+
+### Step 2 — 현재 대화 채점 (Claude 직접 수행)
+
+이 대화의 전체 내용(현재 컨텍스트에 있는 사용자↔Claude 모든 교환)을 아래 4축으로 채점한다.
+
+**채점 기준 — 각 25점:**
+1. `one_shot` — 요구사항·제약(환경/버전/파일구조)을 한 번에 줘서 불필요한 수정 턴을 줄였는가
+2. `context_drift` — 초기 목표 유지, 컨텍스트 오염·무의미한 왕복 없었는가
+3. `ai_control` — 땜질·우회 제안에 안 휩쓸리고 사람이 방향을 주도했는가
+4. `prompt_clarity` — 모호한 표현 없이 에러로그·소스 스니펫 등 명확한 컨텍스트를 줬는가
+
+**채점 태도 — 보수적:**
+- 기본 출발점 각 13점. 명백한 근거가 있을 때만 위로 올린다.
+- 의심스러우면 낮은 쪽. 사소한 마찰(되묻기 1번, 모호한 표현 1번)도 반드시 감점.
+- 보통 대화의 total 정상 범위: 60~75 (B~C). 80(A) 이상은 확실한 근거 필요.
+- 등급: S(92+) / A(82-91) / B(70-81) / C(≤69)
+
+`prompt_smells.type`은 다음 중 하나:
+`"Missing Context"`, `"Vague Instruction"`, `"Scope Creep"`, `"Patch Acceptance"`,
+`"Repeat Question"`, `"Over-specification"`, `"Environment Mismatch"`, `"Tool Misuse"`
+
+### Step 3 — result.json 기록
+
+Step 1에서 읽은 session JSON의 `task_dir` 값을 경로로, `<task_dir>/result.json` 파일을
+Write 도구로 저장한다. 아래 구조를 실제 채점 결과로 채워서 저장:
+
+```json
+{
+  "scores": {"one_shot": 0, "context_drift": 0, "ai_control": 0, "prompt_clarity": 0, "total": 0},
+  "grade": "B",
+  "grade_reason": "1~2문장 근거",
+  "turn_count": 0,
+  "est_tokens": 0,
+  "turn_purity": [50, 60, 55],
+  "prompt_smells": [
+    {"turn_desc": "발생 시점 요약", "description": "구체적 문제", "type": "Vague Instruction", "wasted_turns": 1}
+  ],
+  "good_bad_examples": [
+    {"context": "상황", "bad": "안 좋은 프롬프트 예시", "good": "개선된 프롬프트 예시", "expected_effect": "기대 효과"}
+  ],
+  "skill_recommendations": [
+    {"situation": "작업 상황", "used_approach": "사용한 방식", "better_skill": "더 나은 도구/방법", "reason": "이유"}
+  ],
+  "summary": "전체 요약 2~3문장",
+  "top_improvement": "가장 중요한 개선점 1가지"
+}
+```
+
+### Step 4 — 리포트 생성
+
+```bash
+vibe end
+```
+
+완료 후 report.html 경로를 사용자에게 안내한다.
+
+---
+
+## VibeGraph CLI 미설치 시
+
+```bash
+pip install git+https://github.com/seamoon23/vibegraph.git
+vibe install-skill
+```
+
+설치 후 VS Code를 **완전히 재시작**해야 `/vibe` 명령이 인식됩니다.
+터미널(외부) vs Claude Code 창 구분: `vibe start/end/list` 등 파일 조작 명령은 터미널,
+`/vibe report`의 채점은 Claude Code 창 안에서 이뤄집니다.
+"""
+
+
 # ── vibe start ─────────────────────────────────────────────────────────────────
 
 def cmd_start(args):
@@ -291,6 +411,35 @@ def cmd_prompt(args):
         print(f"    → Claude가 출력한 JSON을 여기에 저장:  {result_path}")
         _open_path(result_path)
     print("    → 저장 후  vibe end  실행")
+
+
+# ── vibe report ────────────────────────────────────────────────────────────────
+
+def cmd_report(args):
+    """result.json이 있으면 vibe end, 없으면 vibe prompt 역할.
+    Claude Code Skill에서 /vibe report 를 통해 자동 채점 후 이 함수가 호출된다."""
+    if not SESSION_FILE.exists():
+        print("❌  진행 중인 세션이 없습니다.  vibe start <project> <task>  로 시작하세요.")
+        sys.exit(1)
+
+    session = json.loads(SESSION_FILE.read_text(encoding="utf-8"))
+    task_dir = Path(session["task_dir"])
+    result_path = task_dir / "result.json"
+
+    # result.json 에 유효한 JSON 이 들어 있으면 → end
+    if result_path.exists():
+        text = result_path.read_text(encoding="utf-8").strip()
+        if "{" in text and len(text) >= 50:
+            print("📋  result.json 확인 → 리포트를 생성합니다...")
+            if not hasattr(args, "file"):
+                args.file = None
+            cmd_end(args)
+            return
+
+    # 없으면 → prompt (채점 프롬프트 클립보드 복사)
+    print("📋  result.json 없음 → 채점 프롬프트를 준비합니다...")
+    print("   ℹ  Claude Code 창에서 /vibe report 를 실행하면 현재 대화를 자동 채점합니다.")
+    cmd_prompt(args)
 
 
 # ── vibe end ───────────────────────────────────────────────────────────────────
@@ -1114,6 +1263,25 @@ def cmd_coach(args):
     print("─" * 55 + "\n")
 
 
+# ── vibe install-skill ─────────────────────────────────────────────────────────
+
+def cmd_install_skill(args):
+    """~/.claude/skills/vibe.md 에 Claude Code Skill 파일을 설치한다."""
+    skills_dir = Path.home() / ".claude" / "skills"
+    skills_dir.mkdir(parents=True, exist_ok=True)
+    target = skills_dir / "vibe.md"
+
+    if target.exists() and not getattr(args, "force", False):
+        print(f"\nℹ  이미 설치되어 있습니다: {target}")
+        print("   덮어쓰려면  vibe install-skill --force  를 실행하세요.\n")
+        return
+
+    target.write_text(SKILL_CONTENT, encoding="utf-8")
+    print(f"\n✅  Skill 파일 설치 완료: {target}")
+    print(f"   Claude Code 창에서 /vibe start, /vibe report 등을 사용할 수 있습니다.")
+    print(f"   ⚠  VS Code를 완전히 재시작해야 /vibe 명령이 인식됩니다.\n")
+
+
 # ── 결과 JSON 파싱 ──────────────────────────────────────────────────────────────
 
 def _grade_of(total: int) -> str:
@@ -1431,6 +1599,17 @@ def main():
 
     sub.add_parser("coach", help="누적 신호 기반 코칭 프롬프트 복사")
 
+    pr = sub.add_parser(
+        "report",
+        help="result.json 있으면 리포트 생성, 없으면 프롬프트 복사 (prompt+end 통합). "
+             "Claude Code 창에서 /vibe report 실행 시 현재 대화 자동 채점")
+    pr.add_argument("--file", help="결과 JSON 경로 (기본: 세션폴더/result.json)")
+
+    pis = sub.add_parser(
+        "install-skill",
+        help="Claude Code Skill 파일을 ~/.claude/skills/vibe.md 에 설치")
+    pis.add_argument("--force", action="store_true", help="기존 파일 덮어쓰기")
+
     ROOT.mkdir(parents=True, exist_ok=True)
 
     args = parser.parse_args()
@@ -1450,6 +1629,10 @@ def main():
         cmd_growth(args)
     elif args.cmd == "coach":
         cmd_coach(args)
+    elif args.cmd == "report":
+        cmd_report(args)
+    elif args.cmd == "install-skill":
+        cmd_install_skill(args)
     else:
         parser.print_help()
 
