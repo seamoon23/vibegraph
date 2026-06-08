@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+import sys
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 """
 VibeGraph - 바이브코딩 대화 순도 분석 CLI  (API 키 불필요)
 Usage:
