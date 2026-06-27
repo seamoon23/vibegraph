@@ -21,4 +21,4 @@ classifiers = [
 vibe = "vibe:main"
 
 [tool.setuptools]
-py-modules = ["vibe"]
+py-modules = ["vibe", "vibe_learning"]

@@ -151,9 +151,24 @@ vibe end                         # 리포트(report.html) 생성 + 조회/성장
 | `vibe dashboard` | 전체 작업 조회 페이지 (= `view`, `index`) |
 | `vibe growth` | 성장 리포트 — 기본 **최근 2주** (`--all` 전체 · `--weeks N` · `--project <이름>`) |
 | `vibe coach` | 누적 신호 기반 코칭 프롬프트 복사 |
+| `vibe learn list` | 열린 Domain Learning Card 목록 |
+| `vibe learn card --last` | 가장 최근 Learning Card 본문 출력 |
+| `vibe learn export` | `LEARNINGS.generated.md` 생성/갱신 |
+| `vibe learn report` | 도메인별/상태별/중요도별 학습 요약 출력 |
 | `vibe install-skill` | Claude Code 슬래시 명령 설치 (`~/.claude/commands/vibe.md`) |
 
 > ⏱ **성장 리포트 기본 기간이 "최근 2주"인 이유**: 전체를 기본으로 하면 작업이 쌓일수록 집계가 느려지고 추세 차트가 복잡해집니다. 전체 흐름은 `vibe growth --all` 로 확인하세요.
+
+### Domain Learning 접근 경로
+
+작업이 끝난 뒤 터미널에서 `vibe report` 또는 `vibe end`를 실행하면, 기존 AI 협업 평가와 함께 `domain_learning.learning_signals`가 있으면 자동으로 Learning Card가 저장됩니다.
+
+- 조회 경로: 터미널 > `vibe learn list`
+- 최근 카드 보기: 터미널 > `vibe learn card --last`
+- Markdown 내보내기: 터미널 > `vibe learn export`
+- 요약 리포트: 터미널 > `vibe learn report`
+
+안전 기본값으로 `vibe learn export`는 사용자가 직접 쓴 `LEARNINGS.md`를 덮어쓰지 않고 `LEARNINGS.generated.md`를 생성합니다.
 
 자세한 흐름은 **`가이드.html`** (더블클릭) 또는 **`사용법.txt`** 를 참고하세요.
 
@@ -163,12 +178,16 @@ vibe end                         # 리포트(report.html) 생성 + 조회/성장
 
 ```
 ~/.vibegraph/                     (= %USERPROFILE%\.vibegraph)
+ ├ ai_sessions.db    AI 평가 세션 요약 인덱스
+ ├ learnings.db      Domain Learning Card 저장소
+ ├ LEARNINGS.generated.md
  ├ index.html        전체 작업 조회 페이지
  ├ growth.html       누적 성장 리포트
  └ <프로젝트>/<날짜_작업명>/
      ├ result.json   Claude가 출력한 채점 결과
      ├ data.json     최종 점수 데이터(통계 연동)
-     └ report.html   개별 리포트
+     ├ report.html   개별 리포트
+     └ learning_card.md  세션별 Learning Card 요약
 ```
 
 - 저장 위치를 바꾸려면 환경변수 **`VIBE_HOME`** 에 원하는 경로를 지정하세요.

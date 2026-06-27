@@ -30,6 +30,8 @@ import argparse
 import datetime
 from pathlib import Path
 
+import vibe_learning
+
 # 코드가 있는 폴더(설치 위치). 데이터와 분리하기 위해 따로 둔다.
 SCRIPT_DIR = Path(__file__).resolve().parent
 
@@ -158,6 +160,13 @@ Java 레거시(1.6~1.8) + Spring + MyBatis + Oracle/MariaDB/Cubrid + Tomcat/JEUS
 예) 직접 grep 반복 → Explore 에이전트 위임 / 거대 코드 통째 붙여넣기 → 파일 경로 참조 /
    다단계 작업 → plan 먼저 / 반복 수정 유발 → 처음에 제약 한 번에 명시 / 단순 조사 → 가벼운 도구로 위임.
 
+[추가 분석 — Domain Learning]
+이번 대화에서 드러난 개발/DB/인프라/업무도메인 지식 공백을 찾아라.
+단순 오타나 일회성 실수는 제외하고, 다음 작업의 정확도/속도/장애대응에 영향을 주는 것만 추출한다.
+프롬프트 문제(prompt_gap)와 도메인 지식 문제(concept_gap/error_pattern/tool_gap/environment_gap/domain_gap/decision_gap)를 구분한다.
+각 learning_signal은 하루 5~10분 안에 복습 가능한 작은 Learning Card가 되어야 한다.
+확실한 공식문서/대표 자료가 있을 때만 references에 넣고, 확실하지 않으면 빈 배열로 둔다. URL을 지어내지 마라.
+
 [출력 규칙]
 - 아래 JSON "한 덩어리만" 출력한다. 인사말·해설 없이. (```json 펜스는 써도 된다)
 - 점수는 정수, total 은 4개 합.
@@ -185,6 +194,25 @@ Java 레거시(1.6~1.8) + Spring + MyBatis + Oracle/MariaDB/Cubrid + Tomcat/JEUS
   "skill_recommendations": [
     {"situation":"이런 작업을 할 때","used_approach":"지금은 이렇게 처리했는데","better_skill":"이 스킬/도구/방법이 더 적합","reason":"토큰효율·정확도 등 이유"}
   ],
+  "domain_learning": {
+    "session_learning_summary": "이번 세션에서 드러난 도메인 지식 공백 요약",
+    "learning_signals": [
+      {
+        "id": "LC-YYYYMMDD-topic",
+        "domain": "Java|Spring|MyBatis|Oracle|CUBRID|SQL|Linux|Docker|Tomcat|JEUS|JBoss|Jenkins|Network|React|TypeScript|AI-Collaboration|Business-Domain|Etc",
+        "type": "concept_gap|error_pattern|tool_gap|environment_gap|domain_gap|prompt_gap|decision_gap",
+        "title": "5~10분 복습 카드 제목",
+        "evidence": "대화에서 이 공백이 드러난 구체적 근거",
+        "severity": 1,
+        "recurrence": 1,
+        "confidence": "low|medium|high",
+        "micro_summary": "핵심 개념 1줄 요약",
+        "micro_goal": "다음 작업 전에 5분 안에 설명할 수 있어야 할 목표",
+        "self_checkpoints": ["다음 작업 시 확인할 질문"],
+        "references": []
+      }
+    ]
+  },
   "summary": "전체 요약 2~3문장",
   "top_improvement": "가장 중요한 개선점 1가지"
 }
@@ -254,6 +282,14 @@ $env:PYTHONUTF8 = "1"; python -c "import os,json; from pathlib import Path; r=Pa
 `"Missing Context"`, `"Vague Instruction"`, `"Scope Creep"`, `"Patch Acceptance"`,
 `"Repeat Question"`, `"Over-specification"`, `"Environment Mismatch"`, `"Tool Misuse"`
 
+**Domain Learning 추가 분석:**
+
+이번 대화에서 드러난 개발/DB/인프라/업무도메인 지식 공백을 찾아라.
+단순 오타나 일회성 실수는 제외하고, 다음 작업의 정확도/속도/장애대응에 영향을 주는 것만 추출한다.
+프롬프트 문제(`prompt_gap`)와 도메인 지식 문제(`concept_gap`, `error_pattern`, `tool_gap`, `environment_gap`, `domain_gap`, `decision_gap`)를 구분한다.
+각 Learning Signal은 하루 5~10분 안에 복습 가능한 작은 카드가 되어야 한다.
+확실한 공식문서/대표 자료가 있을 때만 `references`에 넣고, 확실하지 않으면 빈 배열로 둔다. URL을 지어내지 마라.
+
 **Step 3 — result.json 기록:**
 
 Step 1에서 읽은 session JSON의 `task_dir` 값 경로에 `result.json`을 Write 도구로 저장.
@@ -276,6 +312,25 @@ Step 1에서 읽은 session JSON의 `task_dir` 값 경로에 `result.json`을 Wr
   "skill_recommendations": [
     {"situation": "작업 상황", "used_approach": "사용한 방식", "better_skill": "더 나은 도구/방법", "reason": "이유"}
   ],
+  "domain_learning": {
+    "session_learning_summary": "이번 세션에서 드러난 도메인 지식 공백 요약",
+    "learning_signals": [
+      {
+        "id": "LC-YYYYMMDD-topic",
+        "domain": "Java|Spring|MyBatis|Oracle|CUBRID|SQL|Linux|Docker|Tomcat|JEUS|JBoss|Jenkins|Network|React|TypeScript|AI-Collaboration|Business-Domain|Etc",
+        "type": "concept_gap|error_pattern|tool_gap|environment_gap|domain_gap|prompt_gap|decision_gap",
+        "title": "5~10분 복습 카드 제목",
+        "evidence": "대화에서 이 공백이 드러난 구체적 근거",
+        "severity": 1,
+        "recurrence": 1,
+        "confidence": "low|medium|high",
+        "micro_summary": "핵심 개념 1줄 요약",
+        "micro_goal": "다음 작업 전에 5분 안에 설명할 수 있어야 할 목표",
+        "self_checkpoints": ["다음 작업 시 확인할 질문"],
+        "references": []
+      }
+    ]
+  },
   "summary": "전체 요약 2~3문장",
   "top_improvement": "가장 중요한 개선점 1가지"
 }
@@ -498,6 +553,20 @@ def cmd_end(args):
     report_path = task_dir / "report.html"
     report_path.write_text(html, encoding="utf-8")
 
+    learning_cards = []
+    try:
+        learning_cards = vibe_learning.ingest_learning_result(
+            ROOT,
+            session,
+            data,
+            task_dir,
+            result_json_path=result_path,
+            data_json_path=data_path,
+            report_path=report_path,
+        )
+    except Exception as e:
+        print(f"⚠  Domain Learning 저장 중 경고: {e}")
+
     # 전체 조회 페이지(index.html)·성장 리포트(growth.html) 갱신
     try:
         all_items = _collect_tasks()
@@ -542,6 +611,9 @@ def cmd_end(args):
             print(f"  추정 토큰      : ~{et:,} (추정치)")
     print(f"\n  📄  리포트: {report_path}")
     print(f"  📋  전체 조회: {ROOT / 'index.html'}  (vibe dashboard 로 언제든 열기)")
+    if learning_cards:
+        print(f"  🧠  Learning Card: {len(learning_cards)}개 저장")
+        print(f"      접근 경로: 터미널 > vibe learn list")
     print(f"  💡  더블클릭하면 브라우저에서 바로 열립니다!\n")
 
 
@@ -714,12 +786,56 @@ _CRIT_LABELS = {
 }
 
 
-def generate_index_html(items: list) -> str:
+def generate_index_html(items: list, learning=None) -> str:
     grade_color = {"S": "#10b981", "A": "#3b82f6", "B": "#f59e0b", "C": "#ef4444"}
     total_cnt = len(items)
     avg = (sum(i["total"] for i in items) / total_cnt) if total_cnt else 0
     projects = sorted({i["project"] for i in items})
     opts = "".join(f'<option value="{_esc(p)}">{_esc(p)}</option>' for p in projects)
+    if learning is None:
+        try:
+            learning = vibe_learning.learning_summary(ROOT)
+        except Exception:
+            learning = {"total": 0, "open": 0, "high_open": 0, "by_domain": {}, "review_candidates": []}
+    domains = learning.get("by_domain", {}) or {}
+    domain_chips = "".join(
+        f'<span class="lpill">{_esc(domain)} <b>{count}</b></span>'
+        for domain, count in sorted(domains.items(), key=lambda x: (-x[1], x[0]))[:8]
+    )
+    if not domain_chips:
+        domain_chips = '<span class="muted">아직 도메인 학습 데이터가 없습니다.</span>'
+    review_rows = ""
+    for card in learning.get("review_candidates", [])[:5]:
+        review_rows += f"""
+      <div class="learn-item">
+        <div><b>{_esc(card.get('title', ''))}</b><span>{_esc(card.get('domain', 'Etc'))} · {_esc(card.get('type', 'domain_gap'))} · severity {card.get('severity', 0)}</span></div>
+        <code>{_esc(card.get('id', ''))}</code>
+      </div>"""
+    if not review_rows:
+        review_rows = '<div class="learn-empty">vibe report 또는 vibe end 후 domain_learning 신호가 생기면 여기에 복습 후보가 표시됩니다.</div>'
+    learning_panel = f"""
+  <section class="learn-panel" id="domain-learning">
+    <div class="learn-head">
+      <div>
+        <p class="eyebrow">Domain Learning</p>
+        <h2>AI 작업 이후 드러난 지식 공백</h2>
+      </div>
+      <div class="learn-actions">
+        <code>vibe learn list</code>
+        <code>vibe learn export</code>
+      </div>
+    </div>
+    <div class="learn-grid">
+      <div>
+        <div class="learn-label">도메인 분포</div>
+        <div class="learn-pills">{domain_chips}</div>
+      </div>
+      <div>
+        <div class="learn-label">이번 주 5분 복습 후보</div>
+        {review_rows}
+      </div>
+    </div>
+  </section>"""
 
     rows = ""
     # 최신순 정렬 (날짜+시간 내림차순)
@@ -765,8 +881,27 @@ a:hover{{text-decoration:underline}}
 .wrap{{max-width:1080px;margin:0 auto;padding:26px 20px 64px}}
 .cards{{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:22px}}
 .kpi{{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px 22px;min-width:140px}}
+.kpi.learn{{border-color:#0f766e55;background:#14313a}}
 .kpi .v{{font-size:26px;font-weight:800;color:#f8fafc}}
 .kpi .l{{font-size:12px;color:#94a3b8;margin-top:3px}}
+.learn-panel{{background:#111c2e;border:1px solid #334155;border-radius:12px;padding:20px 22px;margin-bottom:22px}}
+.learn-head{{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:16px}}
+.learn-head h2{{font-size:18px;color:#f8fafc}}
+.eyebrow{{font-size:11px;text-transform:uppercase;color:#5eead4;font-weight:800;letter-spacing:0;margin-bottom:3px}}
+.learn-actions{{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}}
+.learn-actions code{{background:#0b1120;border:1px solid #334155;border-radius:6px;padding:6px 9px;color:#99f6e4;font-size:12px}}
+.learn-grid{{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(320px,1.2fr);gap:18px}}
+@media(max-width:760px){{.learn-grid,.learn-head{{display:block}}.learn-actions{{justify-content:flex-start;margin-top:10px}}}}
+.learn-label{{font-size:12px;color:#94a3b8;font-weight:700;margin-bottom:9px}}
+.learn-pills{{display:flex;gap:8px;flex-wrap:wrap}}
+.lpill{{display:inline-flex;gap:6px;align-items:center;background:#0f172a;border:1px solid #265b63;color:#cbd5e1;border-radius:999px;padding:6px 10px;font-size:12px}}
+.lpill b{{color:#5eead4}}
+.learn-item{{display:flex;justify-content:space-between;gap:12px;align-items:center;border-top:1px solid #243247;padding:9px 0}}
+.learn-item:first-of-type{{border-top:none;padding-top:0}}
+.learn-item b{{display:block;color:#f8fafc;font-size:13px}}
+.learn-item span{{display:block;color:#94a3b8;font-size:12px;margin-top:2px}}
+.learn-item code{{color:#99f6e4;background:#0b1120;border:1px solid #334155;border-radius:6px;padding:4px 7px;font-size:11px;white-space:nowrap}}
+.learn-empty,.muted{{color:#64748b;font-size:13px}}
 .controls{{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}}
 .controls input,.controls select{{background:#0b1120;border:1px solid #334155;border-radius:8px;color:#e2e8f0;padding:10px 13px;font-size:14px;font-family:inherit}}
 .controls input#q{{flex:1;min-width:200px}}
@@ -804,7 +939,11 @@ tbody tr:hover{{background:#26334a}}
     <div class="kpi filt"><div class="v" id="k-cnt">{total_cnt}</div><div class="l">작업 수 (검색 결과)</div></div>
     <div class="kpi filt"><div class="v" id="k-avg">{avg:.1f}</div><div class="l">평균 점수 (검색 결과)</div></div>
     <div class="kpi filt"><div class="v" id="k-proj">{len(projects)}</div><div class="l">프로젝트 수 (검색 결과)</div></div>
+    <div class="kpi learn"><div class="v">{learning.get('open', 0)}</div><div class="l">열린 Learning Card</div></div>
+    <div class="kpi learn"><div class="v">{learning.get('high_open', 0)}</div><div class="l">높은 중요도 카드</div></div>
   </div>
+
+  {learning_panel}
 
   <div class="controls">
     <input id="q" type="text" placeholder="🔍 프로젝트·작업명 검색…">
@@ -889,6 +1028,72 @@ def cmd_dashboard(args):
     print(f"   💡 더블클릭하면 브라우저에서 열립니다. (작업명 클릭 → 개별 리포트)\n")
     if not getattr(args, "no_open", False):
         _open_path(out)
+
+
+# ── vibe learn ────────────────────────────────────────────────────────────────
+
+def cmd_learn(args):
+    action = getattr(args, "learn_cmd", None)
+    if action == "list":
+        cmd_learn_list(args)
+    elif action == "card":
+        cmd_learn_card(args)
+    elif action == "export":
+        cmd_learn_export(args)
+    elif action == "report":
+        cmd_learn_report(args)
+    else:
+        print("사용법: vibe learn <list|card|export|report>")
+        print("접근 경로: 터미널 > vibe learn list")
+
+
+def cmd_learn_list(args):
+    status = None if getattr(args, "all", False) else getattr(args, "status", "open")
+    cards = vibe_learning.list_learning_cards(ROOT, status=status)
+    if not cards:
+        print("\n아직 Learning Card가 없습니다.")
+        print("접근 경로: 터미널 > vibe report 또는 vibe end 실행 후 vibe learn list\n")
+        return
+    print(f"\n  {'ID':<34} {'도메인':<16} {'타입':<18} {'상태':<8} {'중요도':>6}  제목")
+    print("  " + "-" * 104)
+    for card in cards:
+        print(
+            f"  {card['id']:<34} {card['domain']:<16} {card['type']:<18} "
+            f"{card['status']:<8} {card['severity']:>6}  {card['title']}"
+        )
+    print("\n접근 경로: 터미널 > vibe learn card --last")
+    print(f"DB 경로: {vibe_learning.learnings_db_path(ROOT)}\n")
+
+
+def cmd_learn_card(args):
+    card = None
+    card_id = getattr(args, "id", None)
+    if getattr(args, "last", False) or not card_id:
+        card = vibe_learning.get_last_learning_card(ROOT)
+    else:
+        cards = [c for c in vibe_learning.list_learning_cards(ROOT, status=None) if c["id"] == card_id]
+        card = cards[0] if cards else None
+    if not card:
+        print("\nLearning Card가 없습니다.")
+        print("접근 경로: 터미널 > vibe learn list\n")
+        return
+    refs = vibe_learning.list_learning_references(ROOT, card["id"])
+    print()
+    print(vibe_learning.render_learning_card_md(card, refs))
+    print()
+
+
+def cmd_learn_export(args):
+    out = vibe_learning.export_learnings_markdown(ROOT)
+    print(f"\n🧠  Learning Markdown 생성: {out}")
+    print("   안전 기본값으로 LEARNINGS.md는 덮어쓰지 않고 LEARNINGS.generated.md를 갱신했습니다.")
+    print("   접근 경로: 터미널 > vibe learn export\n")
+
+
+def cmd_learn_report(args):
+    print()
+    print(vibe_learning.render_learning_report(ROOT))
+    print()
 
 
 # ── 성장 분석 신호 추출 (A·B 공용) ───────────────────────────────────────────────
@@ -1605,6 +1810,20 @@ def main():
              "Claude Code 창에서 /vibe report 실행 시 현재 대화 자동 채점")
     pr.add_argument("--file", help="결과 JSON 경로 (기본: 세션폴더/result.json)")
 
+    plearn = sub.add_parser("learn", help="Domain Learning Card 조회/내보내기")
+    learn_sub = plearn.add_subparsers(dest="learn_cmd")
+
+    pll = learn_sub.add_parser("list", help="열린 Learning Card 목록")
+    pll.add_argument("--status", default="open", help="조회할 상태 (기본: open)")
+    pll.add_argument("--all", action="store_true", help="모든 상태 조회")
+
+    plc = learn_sub.add_parser("card", help="Learning Card 본문 출력")
+    plc.add_argument("id", nargs="?", help="카드 ID")
+    plc.add_argument("--last", action="store_true", help="가장 최근 카드 출력")
+
+    learn_sub.add_parser("export", help="LEARNINGS.generated.md 생성/갱신")
+    learn_sub.add_parser("report", help="학습 요약 리포트 출력")
+
     pis = sub.add_parser(
         "install-skill",
         help="Claude Code 슬래시 명령을 ~/.claude/commands/vibe.md 에 설치")
@@ -1631,6 +1850,8 @@ def main():
         cmd_coach(args)
     elif args.cmd == "report":
         cmd_report(args)
+    elif args.cmd == "learn":
+        cmd_learn(args)
     elif args.cmd == "install-skill":
         cmd_install_skill(args)
     else:
