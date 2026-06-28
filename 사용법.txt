@@ -75,6 +75,10 @@
 
   vibe learn list        열린 Learning Card 목록
   vibe learn list --all  완료된 카드까지 전체 목록
+  vibe learn list --all --domain Docker --type tool_gap --severity 4 --search logs
+                         조건으로 Learning Card 필터
+  vibe learn add --domain Docker --type tool_gap --title "Docker log triage"
+                         수동 Learning Card 생성
   vibe learn show <id>   특정 Learning Card 본문 보기
   vibe learn done <id>   Learning Card 완료 처리
   vibe learn reopen <id> 완료한 카드를 다시 open 상태로 변경
@@ -161,6 +165,8 @@
 
   자주 쓰는 접근 경로:
     - 터미널 > vibe learn list
+    - 터미널 > vibe learn list --all --domain Docker --type tool_gap
+    - 터미널 > vibe learn add --domain Docker --type tool_gap --title "Docker log triage"
     - 터미널 > vibe learn show <id>
     - 터미널 > vibe learn done <id>
     - 터미널 > vibe learn add-reference <id> --title "제목" --url "URL"

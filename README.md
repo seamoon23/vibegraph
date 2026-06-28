@@ -153,6 +153,8 @@ vibe end                         # 리포트(report.html) 생성 + 조회/성장
 | `vibe coach` | 누적 신호 기반 코칭 프롬프트 복사 |
 | `vibe learn list` | 열린 Domain Learning Card 목록 |
 | `vibe learn list --all` | 완료된 카드까지 포함해 전체 Learning Card 목록 |
+| `vibe learn list --domain <도메인> --type <타입> --severity 4 --search <검색어>` | 조건으로 Learning Card 필터 |
+| `vibe learn add --domain <도메인> --type <타입> --title <제목>` | 수동 Learning Card 생성 |
 | `vibe learn show <id>` | 특정 Learning Card 본문 출력 |
 | `vibe learn card --last` | 가장 최근 Learning Card 본문 출력 |
 | `vibe learn done <id>` | Learning Card 완료 처리 |
@@ -169,6 +171,8 @@ vibe end                         # 리포트(report.html) 생성 + 조회/성장
 작업이 끝난 뒤 터미널에서 `vibe report` 또는 `vibe end`를 실행하면, 기존 AI 협업 평가와 함께 `domain_learning.learning_signals`가 있으면 자동으로 Learning Card가 저장됩니다.
 
 - 조회 경로: 터미널 > `vibe learn list`
+- 필터 조회: 터미널 > `vibe learn list --all --domain Docker --type tool_gap --severity 4 --search logs`
+- 수동 카드 생성: 터미널 > `vibe learn add --domain Docker --type tool_gap --title "Docker log triage"`
 - Claude Code 경로: Claude Code 창 > `/vibe learn list`
 - 최근 카드 보기: 터미널 > `vibe learn card --last`
 - 특정 카드 보기: 터미널 > `vibe learn show <id>`

@@ -224,7 +224,7 @@ Java 레거시(1.6~1.8) + Spring + MyBatis + Oracle/MariaDB/Cubrid + Tomcat/JEUS
 SKILL_CONTENT = """\
 ---
 description: VibeGraph 바이브코딩 채점 + Domain Learning Card 관리. start/report/end/list/dashboard/growth/coach/learn 지원.
-argument-hint: start <project> <task> | report | end | list | dashboard | growth | coach | learn <list|show|done|reopen|add-reference|export|report>
+argument-hint: start <project> <task> | report | end | list | dashboard | growth | coach | learn <list|add|show|done|reopen|add-reference|export|report>
 allowed-tools: [PowerShell, Read, Write]
 ---
 
@@ -251,6 +251,8 @@ $env:PYTHONUTF8 = "1"; vibe $ARGUMENTS
 `learn` 명령 접근 경로:
 - Claude Code 창: `/vibe learn list`
 - 터미널: `vibe learn list`
+- 필터 조회: `vibe learn list --all --domain "<도메인>" --type "<타입>" --severity 4 --search "<검색어>"`
+- 수동 카드 생성: `vibe learn add --domain "<도메인>" --type "<타입>" --title "<제목>"`
 - 카드 보기: `vibe learn show <id>`
 - 완료 처리: `vibe learn done <id>`
 - 다시 열기: `vibe learn reopen <id>`
@@ -848,6 +850,55 @@ def generate_index_html(items: list, learning=None) -> str:
       </div>
     </div>
   </section>"""
+    recent_improvements = []
+    seen_improvements = set()
+    for item in sorted(items, key=lambda x: (x["date"], x["time"]), reverse=True):
+        improvement = (item.get("top_improvement") or "").strip()
+        if improvement and improvement not in seen_improvements:
+            seen_improvements.add(improvement)
+            recent_improvements.append(improvement)
+        if len(recent_improvements) >= 3:
+            break
+    ai_improvement_rows = "".join(f"<li>{_esc(text)}</li>" for text in recent_improvements)
+    if not ai_improvement_rows:
+        ai_improvement_rows = '<li class="muted">아직 AI Review 개선 포인트가 없습니다.</li>'
+    smell_counts = {}
+    for item in items:
+        for smell in item.get("smells", []):
+            smell_counts[smell] = smell_counts.get(smell, 0) + 1
+    smell_rows = "".join(
+        f'<span class="lpill">{_esc(smell)} <b>{count}</b></span>'
+        for smell, count in sorted(smell_counts.items(), key=lambda x: (-x[1], x[0]))[:5]
+    )
+    if not smell_rows:
+        smell_rows = '<span class="muted">반복된 Prompt Smell 데이터가 없습니다.</span>'
+    ai_review_panel = f"""
+  <section class="dash-section" id="ai-review">
+    <div class="section-head">
+      <p class="eyebrow">AI Review</p>
+      <h2>AI 협업 습관 요약</h2>
+    </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="info-v">{avg:.1f}</div><div class="info-l">평균 AI Review 점수</div></div>
+      <div class="info-card"><div class="info-v">{total_cnt}</div><div class="info-l">채점된 세션</div></div>
+      <div class="info-card wide"><div class="info-l">최근 개선 포인트</div><ul class="mini-list">{ai_improvement_rows}</ul></div>
+    </div>
+    <div class="learn-label">반복 Prompt Smell</div>
+    <div class="learn-pills">{smell_rows}</div>
+  </section>"""
+    settings_panel = f"""
+  <section class="dash-section" id="settings">
+    <div class="section-head">
+      <p class="eyebrow">Settings</p>
+      <h2>저장 위치와 접근 경로</h2>
+    </div>
+    <div class="settings-grid">
+      <code>VIBE_HOME: {_esc(str(ROOT))}</code>
+      <code>터미널 &gt; vibe dashboard</code>
+      <code>터미널 &gt; vibe dashboard --no-open</code>
+      <code>터미널 &gt; vibe learn list</code>
+    </div>
+  </section>"""
 
     rows = ""
     # 최신순 정렬 (날짜+시간 내림차순)
@@ -891,6 +942,23 @@ a:hover{{text-decoration:underline}}
 .hd h1{{font-size:24px;font-weight:800;color:#f8fafc}}
 .hd .sub{{color:#94a3b8;font-size:13px;margin-top:6px}}
 .wrap{{max-width:1080px;margin:0 auto;padding:26px 20px 64px}}
+.dash-tabs{{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;position:sticky;top:0;background:#0f172acc;backdrop-filter:blur(8px);padding:8px 0;z-index:2}}
+.dash-tabs a{{background:#1e293b;border:1px solid #334155;border-radius:8px;color:#cbd5e1;padding:8px 11px;font-size:13px;text-decoration:none}}
+.dash-tabs a:hover{{background:#26334a;color:#f8fafc;text-decoration:none}}
+.dash-section{{background:#111c2e;border:1px solid #334155;border-radius:12px;padding:20px 22px;margin-bottom:22px;scroll-margin-top:58px}}
+.section-head{{margin-bottom:14px}}
+.section-head h2{{font-size:18px;color:#f8fafc}}
+.info-grid{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px}}
+@media(max-width:760px){{.info-grid{{grid-template-columns:1fr}}}}
+.info-card{{background:#0f172a;border:1px solid #293548;border-radius:8px;padding:14px}}
+.info-card.wide{{grid-column:span 1}}
+.info-v{{font-size:24px;font-weight:800;color:#f8fafc}}
+.info-l{{font-size:12px;color:#94a3b8;margin-bottom:6px}}
+.mini-list{{margin:0 0 0 18px;color:#cbd5e1;font-size:13px}}
+.mini-list li{{margin:3px 0}}
+.settings-grid{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
+@media(max-width:760px){{.settings-grid{{grid-template-columns:1fr}}}}
+.settings-grid code{{background:#0b1120;border:1px solid #334155;border-radius:8px;color:#99f6e4;padding:9px 10px;font-size:12px;overflow-wrap:anywhere}}
 .cards{{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:22px}}
 .kpi{{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px 22px;min-width:140px}}
 .kpi.learn{{border-color:#0f766e55;background:#14313a}}
@@ -947,40 +1015,64 @@ tbody tr:hover{{background:#26334a}}
     &nbsp;·&nbsp; <a href="growth.html">📈 성장 리포트 →</a></div>
 </div>
 <div class="wrap">
-  <div class="cards">
-    <div class="kpi filt"><div class="v" id="k-cnt">{total_cnt}</div><div class="l">작업 수 (검색 결과)</div></div>
-    <div class="kpi filt"><div class="v" id="k-avg">{avg:.1f}</div><div class="l">평균 점수 (검색 결과)</div></div>
-    <div class="kpi filt"><div class="v" id="k-proj">{len(projects)}</div><div class="l">프로젝트 수 (검색 결과)</div></div>
-    <div class="kpi learn"><div class="v">{learning.get('open', 0)}</div><div class="l">열린 Learning Card</div></div>
-    <div class="kpi learn"><div class="v">{learning.get('high_open', 0)}</div><div class="l">높은 중요도 카드</div></div>
-  </div>
+  <nav class="dash-tabs" aria-label="Dashboard sections">
+    <a href="#summary">Summary</a>
+    <a href="#ai-review">AI Review</a>
+    <a href="#domain-learning">Domain Learning</a>
+    <a href="#sessions">Sessions</a>
+    <a href="#settings">Settings</a>
+  </nav>
+
+  <section class="dash-section" id="summary">
+    <div class="section-head">
+      <p class="eyebrow">Summary</p>
+      <h2>작업과 학습 현황</h2>
+    </div>
+    <div class="cards">
+      <div class="kpi filt"><div class="v" id="k-cnt">{total_cnt}</div><div class="l">작업 수 (검색 결과)</div></div>
+      <div class="kpi filt"><div class="v" id="k-avg">{avg:.1f}</div><div class="l">평균 점수 (검색 결과)</div></div>
+      <div class="kpi filt"><div class="v" id="k-proj">{len(projects)}</div><div class="l">프로젝트 수 (검색 결과)</div></div>
+      <div class="kpi learn"><div class="v">{learning.get('open', 0)}</div><div class="l">열린 Learning Card</div></div>
+      <div class="kpi learn"><div class="v">{learning.get('high_open', 0)}</div><div class="l">높은 중요도 카드</div></div>
+    </div>
+  </section>
+
+  {ai_review_panel}
 
   {learning_panel}
 
-  <div class="controls">
-    <input id="q" type="text" placeholder="🔍 프로젝트·작업명 검색…">
-    <select id="pf"><option value="">전체 프로젝트</option>{opts}</select>
-    <input id="d1" type="date" title="시작일">
-    <span class="tilde">~</span>
-    <input id="d2" type="date" title="종료일">
-    <button id="clr" type="button">초기화</button>
-  </div>
-  <div class="count" id="cnt"></div>
+  <section class="dash-section" id="sessions">
+    <div class="section-head">
+      <p class="eyebrow">Sessions</p>
+      <h2>채점된 작업 목록</h2>
+    </div>
+    <div class="controls">
+      <input id="q" type="text" placeholder="🔍 프로젝트·작업명 검색…">
+      <select id="pf"><option value="">전체 프로젝트</option>{opts}</select>
+      <input id="d1" type="date" title="시작일">
+      <span class="tilde">~</span>
+      <input id="d2" type="date" title="종료일">
+      <button id="clr" type="button">초기화</button>
+    </div>
+    <div class="count" id="cnt"></div>
 
-  <table id="tbl">
-    <thead>
-      <tr>
-        <th data-sort="date">날짜 ▾</th>
-        <th data-sort="project">프로젝트</th>
-        <th data-sort="task">작업명</th>
-        <th class="c-num" data-sort="total">점수</th>
-        <th class="c-grade" data-sort="total">등급</th>
-        <th class="c-num" data-sort="turn">턴</th>
-        <th class="c-num" data-sort="tok">추정토큰</th>
-      </tr>
-    </thead>
-    <tbody>{rows}</tbody>
-  </table>
+    <table id="tbl">
+      <thead>
+        <tr>
+          <th data-sort="date">날짜 ▾</th>
+          <th data-sort="project">프로젝트</th>
+          <th data-sort="task">작업명</th>
+          <th class="c-num" data-sort="total">점수</th>
+          <th class="c-grade" data-sort="total">등급</th>
+          <th class="c-num" data-sort="turn">턴</th>
+          <th class="c-num" data-sort="tok">추정토큰</th>
+        </tr>
+      </thead>
+      <tbody>{rows}</tbody>
+    </table>
+  </section>
+
+  {settings_panel}
   <div class="foot">VibeGraph · 바이브코딩을 엔지니어링으로</div>
 </div>
 <script>
@@ -1058,6 +1150,8 @@ def cmd_learn(args):
         cmd_learn_status(args, "open")
     elif action == "add-reference":
         cmd_learn_add_reference(args)
+    elif action == "add":
+        cmd_learn_add(args)
     elif action == "export":
         cmd_learn_export(args)
     elif action == "report":
@@ -1069,7 +1163,14 @@ def cmd_learn(args):
 
 def cmd_learn_list(args):
     status = None if getattr(args, "all", False) else getattr(args, "status", "open")
-    cards = vibe_learning.list_learning_cards(ROOT, status=status)
+    cards = vibe_learning.list_learning_cards(
+        ROOT,
+        status=status,
+        domain=getattr(args, "domain", None),
+        signal_type=getattr(args, "type", None),
+        min_severity=getattr(args, "severity", None),
+        search=getattr(args, "search", None),
+    )
     if not cards:
         print("\n아직 Learning Card가 없습니다.")
         print("접근 경로: 터미널 > vibe report 또는 vibe end 실행 후 vibe learn list\n")
@@ -1133,6 +1234,29 @@ def cmd_learn_add_reference(args):
         sys.exit(1)
     print(f"\n🔗  참고 링크 추가: {ref['title']} ({ref['url']})")
     print(f"접근 경로: 터미널 > vibe learn show {args.id}\n")
+
+
+def cmd_learn_add(args):
+    try:
+        card = vibe_learning.create_manual_learning_card(
+            ROOT,
+            domain=args.domain,
+            signal_type=args.type,
+            title=args.title,
+            evidence=args.evidence or "",
+            severity=args.severity,
+            confidence=args.confidence,
+            micro_summary=args.summary or "",
+            micro_goal=args.goal or "",
+            self_checkpoints=args.checkpoint or [],
+        )
+    except ValueError as e:
+        print(f"\nLearning Card를 만들 수 없습니다: {e}")
+        print("접근 경로: 터미널 > vibe learn add --domain <도메인> --type <타입> --title <제목>\n")
+        sys.exit(1)
+    print(f"\n🧠  Learning Card 생성: {card['id']}")
+    print(f"   {card['title']}")
+    print(f"접근 경로: 터미널 > vibe learn show {card['id']}\n")
 
 
 def cmd_learn_export(args):
@@ -1904,6 +2028,10 @@ def main():
     pll = learn_sub.add_parser("list", help="열린 Learning Card 목록")
     pll.add_argument("--status", default="open", help="조회할 상태 (기본: open)")
     pll.add_argument("--all", action="store_true", help="모든 상태 조회")
+    pll.add_argument("--domain", help="특정 도메인만 조회")
+    pll.add_argument("--type", help="특정 Learning Signal 타입만 조회")
+    pll.add_argument("--severity", type=int, help="최소 severity")
+    pll.add_argument("--search", help="제목/근거/요약 검색어")
 
     plc = learn_sub.add_parser("card", help="Learning Card 본문 출력")
     plc.add_argument("id", nargs="?", help="카드 ID")
@@ -1924,6 +2052,17 @@ def main():
     plref.add_argument("--url", required=True, help="참고 링크 URL 또는 file 경로")
     plref.add_argument("--type", default="etc", help="reference 타입 (기본: etc)")
     plref.add_argument("--note", default="", help="참고 링크 메모")
+
+    pla = learn_sub.add_parser("add", help="수동 Learning Card 생성")
+    pla.add_argument("--domain", required=True, help="도메인")
+    pla.add_argument("--type", required=True, help="Learning Signal 타입")
+    pla.add_argument("--title", required=True, help="카드 제목")
+    pla.add_argument("--evidence", default="", help="근거 또는 메모")
+    pla.add_argument("--severity", type=int, default=3, help="중요도 1-5")
+    pla.add_argument("--confidence", default="medium", help="low|medium|high")
+    pla.add_argument("--summary", default="", help="핵심 개념 1줄 요약")
+    pla.add_argument("--goal", default="", help="5분 복습 목표")
+    pla.add_argument("--checkpoint", action="append", help="셀프 체크포인트. 여러 번 지정 가능")
 
     learn_sub.add_parser("export", help="LEARNINGS.generated.md 생성/갱신")
     learn_sub.add_parser("report", help="학습 요약 리포트 출력")

@@ -1,6 +1,6 @@
 ---
 description: VibeGraph 바이브코딩 채점 + Domain Learning Card 관리. start/report/end/list/dashboard/growth/coach/learn 지원.
-argument-hint: start <project> <task> | report | end | list | dashboard | growth | coach | learn <list|show|done|reopen|add-reference|export|report>
+argument-hint: start <project> <task> | report | end | list | dashboard | growth | coach | learn <list|add|show|done|reopen|add-reference|export|report>
 allowed-tools: [PowerShell, Read, Write]
 ---
 
@@ -27,6 +27,8 @@ $env:PYTHONUTF8 = "1"; vibe $ARGUMENTS
 `learn` 명령 접근 경로:
 - Claude Code 창: `/vibe learn list`
 - 터미널: `vibe learn list`
+- 필터 조회: `vibe learn list --all --domain "<도메인>" --type "<타입>" --severity 4 --search "<검색어>"`
+- 수동 카드 생성: `vibe learn add --domain "<도메인>" --type "<타입>" --title "<제목>"`
 - 카드 보기: `vibe learn show <id>`
 - 완료 처리: `vibe learn done <id>`
 - 다시 열기: `vibe learn reopen <id>`

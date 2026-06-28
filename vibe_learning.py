@@ -335,13 +335,37 @@ def save_learning_cards(root: Path, cards: list[dict[str, Any]], now: str | None
                 )
 
 
-def list_learning_cards(root: Path, status: str | None = None, limit: int | None = None) -> list[dict[str, Any]]:
+def list_learning_cards(
+    root: Path,
+    status: str | None = None,
+    limit: int | None = None,
+    domain: str | None = None,
+    signal_type: str | None = None,
+    min_severity: int | None = None,
+    search: str | None = None,
+) -> list[dict[str, Any]]:
     init_learnings_db(root)
     query = "SELECT * FROM learning_cards"
+    clauses = []
     params: list[Any] = []
     if status:
-        query += " WHERE status = ?"
+        clauses.append("status = ?")
         params.append(status)
+    if domain:
+        clauses.append("lower(domain) = lower(?)")
+        params.append(domain)
+    if signal_type:
+        clauses.append("type = ?")
+        params.append(signal_type)
+    if min_severity is not None:
+        clauses.append("severity >= ?")
+        params.append(_as_int(min_severity))
+    if search:
+        clauses.append("(lower(title) LIKE lower(?) OR lower(evidence) LIKE lower(?) OR lower(micro_summary) LIKE lower(?))")
+        needle = f"%{search}%"
+        params.extend([needle, needle, needle])
+    if clauses:
+        query += " WHERE " + " AND ".join(clauses)
     query += " ORDER BY created_at DESC, severity DESC, id DESC"
     if limit:
         query += " LIMIT ?"
@@ -387,6 +411,52 @@ def get_learning_card(root: Path, card_id: str) -> dict[str, Any] | None:
 def get_last_learning_card(root: Path) -> dict[str, Any] | None:
     cards = list_learning_cards(root, limit=1)
     return cards[0] if cards else None
+
+
+def create_manual_learning_card(
+    root: Path,
+    domain: str,
+    signal_type: str,
+    title: str,
+    evidence: str = "",
+    severity: int = 3,
+    confidence: str = "medium",
+    micro_summary: str = "",
+    micro_goal: str = "",
+    self_checkpoints: list[str] | None = None,
+) -> dict[str, Any]:
+    now = datetime.datetime.now().isoformat(timespec="seconds")
+    session = {
+        "project": "manual",
+        "task": "Manual Learning Card",
+        "started_at": now,
+    }
+    signal = {
+        "domain": domain,
+        "type": signal_type,
+        "title": title,
+        "evidence": evidence,
+        "severity": severity,
+        "confidence": confidence,
+        "micro_summary": micro_summary,
+        "micro_goal": micro_goal,
+        "self_checkpoints": self_checkpoints or [],
+        "references": [],
+    }
+    card = normalize_learning_signal(
+        signal,
+        session,
+        {"ended_at": now},
+        Path(root) / "manual",
+        "manual",
+        1,
+        now,
+    )
+    save_learning_cards(Path(root), [card], now=now)
+    stored = get_learning_card(root, card["id"])
+    if stored is None:
+        raise KeyError(card["id"])
+    return stored
 
 
 def update_learning_card_status(root: Path, card_id: str, status: str) -> dict[str, Any]:

@@ -142,6 +142,32 @@ class LearningLayerTests(unittest.TestCase):
         refs = vibe_learning.list_learning_references(self.root, updated["id"])
         self.assertEqual(refs[-1]["title"], "Internal runbook")
 
+    def test_manual_card_creation_and_filtered_listing(self):
+        vibe_learning.ingest_learning_result(self.root, self.session, self.result, self.task_dir)
+        manual = vibe_learning.create_manual_learning_card(
+            self.root,
+            domain="Docker",
+            signal_type="tool_gap",
+            title="Docker log triage checklist",
+            evidence="Manual note from production support.",
+            severity=5,
+            confidence="high",
+            micro_summary="Check status, logs, and restart count first.",
+            micro_goal="Explain Docker log triage in five minutes.",
+            self_checkpoints=["Run docker ps -a.", "Check restart count."],
+        )
+
+        self.assertTrue(manual["id"].startswith("LC-"))
+        docker_cards = vibe_learning.list_learning_cards(
+            self.root,
+            domain="Docker",
+            signal_type="tool_gap",
+            min_severity=5,
+            search="triage",
+        )
+        self.assertEqual([card["id"] for card in docker_cards], [manual["id"]])
+        self.assertEqual(vibe_learning.list_learning_cards(self.root, domain="Oracle")[0]["domain"], "Oracle")
+
 
 if __name__ == "__main__":
     unittest.main()

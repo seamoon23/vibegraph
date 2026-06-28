@@ -138,6 +138,48 @@ class VibeCliLearningTests(unittest.TestCase):
         self.assertIn("Docker logs doc", shown.stdout)
         self.assertIn("https://docs.docker.com/", shown.stdout)
 
+        manual = self.run_vibe(
+            "learn",
+            "add",
+            "--domain",
+            "Oracle",
+            "--type",
+            "concept_gap",
+            "--title",
+            "Oracle grants checklist",
+            "--evidence",
+            "Manual follow-up note.",
+            "--severity",
+            "5",
+            "--summary",
+            "Check direct grants before role grants.",
+            "--goal",
+            "Explain Oracle direct grants in five minutes.",
+            "--checkpoint",
+            "Check object owner.",
+            "--checkpoint",
+            "Check direct grant.",
+        )
+        self.assertEqual(manual.returncode, 0, manual.stdout + manual.stderr)
+        self.assertIn("Oracle grants checklist", manual.stdout)
+
+        filtered = self.run_vibe(
+            "learn",
+            "list",
+            "--all",
+            "--domain",
+            "Oracle",
+            "--type",
+            "concept_gap",
+            "--severity",
+            "5",
+            "--search",
+            "grants",
+        )
+        self.assertEqual(filtered.returncode, 0, filtered.stdout + filtered.stderr)
+        self.assertIn("Oracle grants checklist", filtered.stdout)
+        self.assertNotIn("LC-20260628-docker-logs", filtered.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
