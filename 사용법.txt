@@ -69,6 +69,20 @@
   vibe growth            누적 성장 리포트(추세·최약점·반복스멜) 생성/열기
   vibe coach             누적 신호 기반 코칭 프롬프트 복사 (Claude창에서 코칭)
 
+  [Domain Learning Card]
+  접근 경로: 터미널 > vibe learn list
+  Claude Code 경로: Claude Code 창 > /vibe learn list
+
+  vibe learn list        열린 Learning Card 목록
+  vibe learn list --all  완료된 카드까지 전체 목록
+  vibe learn show <id>   특정 Learning Card 본문 보기
+  vibe learn done <id>   Learning Card 완료 처리
+  vibe learn reopen <id> 완료한 카드를 다시 open 상태로 변경
+  vibe learn add-reference <id> --title "제목" --url "URL"
+                         카드에 참고 링크 추가
+  vibe learn export      LEARNINGS.generated.md 생성/갱신
+  vibe learn report      도메인별/상태별/중요도별 학습 요약
+
 
 [ 전체 작업 한눈에 보기 ]
 ------------------------------------------------------------
@@ -84,6 +98,8 @@
     - 프로젝트 드롭다운으로 좁혀 보기
     - 열 제목 클릭으로 날짜·점수·턴·토큰 정렬
     - 등급 배지(S·A·B·C), 턴 수·추정 토큰 표시
+    - Domain Learning 요약: 열린 카드 수 / 높은 중요도 카드 /
+      이번 주 5분 복습 후보
     - 작업명 클릭 → 그 작업의 개별 리포트가 새 탭으로 열림
 
   ※ vibe end 할 때마다 index.html 이 자동 갱신됩니다.
@@ -131,6 +147,28 @@
   ※ vibe end 할 때마다 growth.html 도 함께 자동 갱신됩니다.
     (자동 생성은 '최근 2주' 기준 — 속도·가독성. 전체는 vibe growth --all)
     index.html 과 growth.html 은 상단 링크로 서로 오갈 수 있습니다.
+
+
+[ Domain Learning Card ]
+------------------------------------------------------------
+  작업이 끝난 뒤 vibe report 또는 vibe end 를 실행하면,
+  채점 JSON 안의 domain_learning.learning_signals 가 자동 저장됩니다.
+
+  생성되는 것:
+    - ~/.vibegraph\learnings.db
+    - 세션 폴더의 learning_card.md
+    - vibe learn export 실행 시 LEARNINGS.generated.md
+
+  자주 쓰는 접근 경로:
+    - 터미널 > vibe learn list
+    - 터미널 > vibe learn show <id>
+    - 터미널 > vibe learn done <id>
+    - 터미널 > vibe learn add-reference <id> --title "제목" --url "URL"
+    - Claude Code 창 > /vibe learn list
+
+  안전 기본값:
+    vibe learn export 는 사용자가 직접 쓴 LEARNINGS.md 를 덮어쓰지 않고
+    LEARNINGS.generated.md 를 생성합니다.
 
 
 [ 여러 작업을 연달아 할 때 ]
@@ -189,13 +227,17 @@
 ------------------------------------------------------------
   채점 데이터는 코드와 분리되어 사용자 폴더에 쌓입니다.
    ~/.vibegraph\   (= %USERPROFILE%\.vibegraph)
+   ├ ai_sessions.db    AI 평가 세션 요약 인덱스
+   ├ learnings.db      Domain Learning Card 저장소
+   ├ LEARNINGS.generated.md
    ├ index.html        ★ 전체 작업 조회 페이지 (vibe dashboard)
    ├ growth.html       ★ 누적 성장 리포트 (vibe growth)
    └ <프로젝트명>\
        └ <날짜_작업명>\
            ├ result.json   Claude가 출력한 채점 결과(붙여넣기)
            ├ data.json     최종 점수 데이터(통계 연동)
-           └ report.html   리포트
+           ├ report.html   리포트
+           └ learning_card.md  세션별 Learning Card 요약
 
   - 저장 위치를 바꾸려면 환경변수 VIBE_HOME 에 경로를 지정하세요.
   - 예전처럼 코드 폴더에 데이터가 있던 경우, 첫 실행 때 사용자

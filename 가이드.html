@@ -143,6 +143,21 @@ a:hover{text-decoration:underline}
     <p><span class="loc loc-term">터미널</span><b>⑦ 확인</b> — 생성된 <span class="kbd">report.html</span> 을 더블클릭하면 브라우저에서 열립니다.</p>
   </div>
 
+  <div class="secbar">■ Domain Learning Card</div>
+  <div class="step">
+    <p><span class="loc loc-term">터미널</span><b>학습 카드 조회</b> — <span class="kbd">vibe report</span> 또는 <span class="kbd">vibe end</span> 후
+       채점 JSON에 <span class="kbd">domain_learning.learning_signals</span> 가 있으면 Learning Card가 자동 저장됩니다.</p>
+    <div class="cmd" id="cl1">vibe learn list<button class="copy" data-t="cl1">복사</button></div>
+    <p><span class="loc loc-chat">Claude Code 창</span>에서도 같은 경로로 볼 수 있습니다.</p>
+    <div class="cmd" id="cl2">/vibe learn list<button class="copy" data-t="cl2">복사</button></div>
+    <p>자주 쓰는 관리 명령입니다.</p>
+    <div class="cmd" id="cl3">vibe learn show &lt;id&gt;<button class="copy" data-t="cl3">복사</button></div>
+    <div class="cmd" id="cl4">vibe learn done &lt;id&gt;<button class="copy" data-t="cl4">복사</button></div>
+    <div class="cmd" id="cl5">vibe learn add-reference &lt;id&gt; --title "제목" --url "URL"<button class="copy" data-t="cl5">복사</button></div>
+    <div class="tip">✅ <span class="kbd">vibe learn export</span> 는 사용자가 직접 쓴 <span class="kbd">LEARNINGS.md</span> 를 덮어쓰지 않고
+       <span class="kbd">LEARNINGS.generated.md</span> 를 생성합니다.</div>
+  </div>
+
 
   <div class="secbar">■ 여러 작업을 연달아 할 때</div>
 
@@ -205,6 +220,14 @@ a:hover{text-decoration:underline}
       <tr><td>vibe dashboard</td><td>전체 작업 조회 페이지 생성/열기 (= view, index)</td></tr>
       <tr><td>vibe growth</td><td>성장 리포트 생성/열기 — <b>기본 최근 2주</b> (전체: --all, 기간: --weeks N, 프로젝트: --project)</td></tr>
       <tr><td>vibe coach</td><td>누적 신호 기반 코칭 프롬프트 복사 → Claude창에서 코칭</td></tr>
+      <tr><td>vibe learn list</td><td>열린 Domain Learning Card 목록</td></tr>
+      <tr><td>vibe learn list --all</td><td>완료된 카드까지 전체 목록</td></tr>
+      <tr><td>vibe learn show &lt;id&gt;</td><td>특정 Learning Card 본문 보기</td></tr>
+      <tr><td>vibe learn done &lt;id&gt;</td><td>Learning Card 완료 처리</td></tr>
+      <tr><td>vibe learn reopen &lt;id&gt;</td><td>완료한 카드를 다시 open 상태로 변경</td></tr>
+      <tr><td>vibe learn add-reference &lt;id&gt; --title "제목" --url "URL"</td><td>카드에 참고 링크 추가</td></tr>
+      <tr><td>vibe learn export</td><td>LEARNINGS.generated.md 생성/갱신</td></tr>
+      <tr><td>vibe learn report</td><td>도메인별/상태별/중요도별 학습 요약</td></tr>
     </table>
   </div>
 
@@ -248,6 +271,7 @@ a:hover{text-decoration:underline}
       <li>🗂 <b>프로젝트 드롭다운</b> 으로 좁혀 보기</li>
       <li>↕ <b>열 제목 클릭</b> 으로 날짜·점수·턴·토큰 정렬</li>
       <li>🏷 등급 배지(S·A·B·C)와 턴 수·추정 토큰 표시</li>
+      <li>🧠 Domain Learning 요약 — 열린 카드 수 · 높은 중요도 카드 · 5분 복습 후보</li>
       <li>🔗 <b>작업명을 클릭</b> 하면 그 작업의 개별 리포트가 새 탭으로 열림</li>
     </ul>
     <div class="tip">✅ <span class="kbd">vibe end</span> 를 할 때마다 <span class="kbd">index.html</span> 이 <b>자동 갱신</b>됩니다.
@@ -261,13 +285,17 @@ a:hover{text-decoration:underline}
     <p>채점 데이터는 <b>코드와 분리되어</b> 사용자 폴더 <span class="kbd">~/.vibegraph</span>
        (= <span class="kbd">%USERPROFILE%\.vibegraph</span>) 에 프로젝트별로 쌓입니다.</p>
     <div class="flow">~/.vibegraph\
+ ├ ai_sessions.db    AI 평가 세션 요약 인덱스
+ ├ learnings.db      Domain Learning Card 저장소
+ ├ LEARNINGS.generated.md
  ├ index.html        ★ 전체 작업 조회 페이지 (vibe dashboard)
  ├ growth.html       ★ 누적 성장 리포트 (vibe growth)
  └ &lt;프로젝트명&gt;\
      └ &lt;날짜_작업명&gt;\
          ├ result.json   Claude가 출력한 채점 결과(붙여넣기)
          ├ data.json     최종 점수 데이터(통계 연동)
-         └ report.html   리포트</div>
+         ├ report.html   리포트
+         └ learning_card.md  세션별 Learning Card 요약</div>
     <div class="note">📦 저장 위치를 바꾸려면 환경변수 <span class="kbd">VIBE_HOME</span> 에 원하는 경로를 지정하세요.
        예전처럼 코드 폴더에 데이터가 있던 경우, 첫 실행 때 사용자 폴더로 <b>자동 이전</b>됩니다.</div>
     <div class="tip">📊 <a href="sample_report.html" target="_blank">샘플 리포트 미리보기 →</a></div>

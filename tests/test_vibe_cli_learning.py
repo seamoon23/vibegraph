@@ -100,6 +100,44 @@ class VibeCliLearningTests(unittest.TestCase):
         self.assertEqual(export.returncode, 0, export.stdout + export.stderr)
         self.assertTrue((self.root / "LEARNINGS.generated.md").exists())
 
+        done = self.run_vibe("learn", "done", "LC-20260628-docker-logs")
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.assertIn("done", done.stdout)
+
+        open_listing = self.run_vibe("learn", "list")
+        self.assertEqual(open_listing.returncode, 0, open_listing.stdout + open_listing.stderr)
+        self.assertIn("아직 Learning Card가 없습니다", open_listing.stdout)
+
+        all_listing = self.run_vibe("learn", "list", "--all")
+        self.assertEqual(all_listing.returncode, 0, all_listing.stdout + all_listing.stderr)
+        self.assertIn("LC-20260628-docker-logs", all_listing.stdout)
+        self.assertIn("done", all_listing.stdout)
+
+        reopened = self.run_vibe("learn", "reopen", "LC-20260628-docker-logs")
+        self.assertEqual(reopened.returncode, 0, reopened.stdout + reopened.stderr)
+        self.assertIn("open", reopened.stdout)
+
+        add_ref = self.run_vibe(
+            "learn",
+            "add-reference",
+            "LC-20260628-docker-logs",
+            "--title",
+            "Docker logs doc",
+            "--url",
+            "https://docs.docker.com/",
+            "--type",
+            "official_doc",
+            "--note",
+            "Official docs entry point.",
+        )
+        self.assertEqual(add_ref.returncode, 0, add_ref.stdout + add_ref.stderr)
+        self.assertIn("Docker logs doc", add_ref.stdout)
+
+        shown = self.run_vibe("learn", "show", "LC-20260628-docker-logs")
+        self.assertEqual(shown.returncode, 0, shown.stdout + shown.stderr)
+        self.assertIn("Docker logs doc", shown.stdout)
+        self.assertIn("https://docs.docker.com/", shown.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

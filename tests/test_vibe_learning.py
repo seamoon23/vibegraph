@@ -118,6 +118,30 @@ class LearningLayerTests(unittest.TestCase):
         stored = vibe_learning.list_learning_cards(self.root)
         self.assertEqual([card["id"] for card in stored], ["LC-20260628-oracle-invalid-object"])
 
+    def test_update_card_status_and_add_reference(self):
+        vibe_learning.ingest_learning_result(self.root, self.session, self.result, self.task_dir)
+
+        updated = vibe_learning.update_learning_card_status(
+            self.root,
+            "LC-20260628-oracle-invalid-object",
+            "done",
+        )
+        self.assertEqual(updated["status"], "done")
+        self.assertEqual(vibe_learning.list_learning_cards(self.root, status="open"), [])
+        self.assertEqual(vibe_learning.get_learning_card(self.root, updated["id"])["status"], "done")
+
+        ref = vibe_learning.add_learning_reference(
+            self.root,
+            updated["id"],
+            title="Internal runbook",
+            url="file://team/oracle-invalid-object.md",
+            ref_type="internal_doc",
+            note="Team checklist candidate.",
+        )
+        self.assertEqual(ref["url"], "file://team/oracle-invalid-object.md")
+        refs = vibe_learning.list_learning_references(self.root, updated["id"])
+        self.assertEqual(refs[-1]["title"], "Internal runbook")
+
 
 if __name__ == "__main__":
     unittest.main()

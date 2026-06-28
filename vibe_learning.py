@@ -376,9 +376,66 @@ def list_learning_references(root: Path, card_id: str) -> list[dict[str, str]]:
     ]
 
 
+def get_learning_card(root: Path, card_id: str) -> dict[str, Any] | None:
+    init_learnings_db(root)
+    with sqlite3.connect(learnings_db_path(root)) as con:
+        con.row_factory = sqlite3.Row
+        row = con.execute("SELECT * FROM learning_cards WHERE id = ?", (card_id,)).fetchone()
+    return _row_to_card(row) if row else None
+
+
 def get_last_learning_card(root: Path) -> dict[str, Any] | None:
     cards = list_learning_cards(root, limit=1)
     return cards[0] if cards else None
+
+
+def update_learning_card_status(root: Path, card_id: str, status: str) -> dict[str, Any]:
+    if status not in {"open", "done"}:
+        raise ValueError("status must be open or done")
+    init_learnings_db(root)
+    now = datetime.datetime.now().isoformat(timespec="seconds")
+    with sqlite3.connect(learnings_db_path(root)) as con:
+        cur = con.execute(
+            "UPDATE learning_cards SET status = ?, updated_at = ? WHERE id = ?",
+            (status, now, card_id),
+        )
+        if cur.rowcount == 0:
+            raise KeyError(card_id)
+    card = get_learning_card(root, card_id)
+    if card is None:
+        raise KeyError(card_id)
+    return card
+
+
+def add_learning_reference(
+    root: Path,
+    card_id: str,
+    title: str,
+    url: str,
+    ref_type: str = "etc",
+    note: str = "",
+) -> dict[str, str]:
+    init_learnings_db(root)
+    if not get_learning_card(root, card_id):
+        raise KeyError(card_id)
+    title = title.strip() or url.strip()
+    url = url.strip()
+    if not url:
+        raise ValueError("url is required")
+    ref_type = ref_type.strip() or "etc"
+    note = note.strip()
+    now = datetime.datetime.now().isoformat(timespec="seconds")
+    with sqlite3.connect(learnings_db_path(root)) as con:
+        con.execute(
+            """
+            INSERT INTO learning_references
+                (card_id, title, url, ref_type, note, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (card_id, title, url, ref_type, note, now),
+        )
+        con.execute("UPDATE learning_cards SET updated_at = ? WHERE id = ?", (now, card_id))
+    return {"title": title, "url": url, "type": ref_type, "note": note}
 
 
 def write_session_learning_card(task_dir: Path, cards: list[dict[str, Any]], summary: str = "") -> Path | None:

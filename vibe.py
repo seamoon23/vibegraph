@@ -223,8 +223,8 @@ Java 레거시(1.6~1.8) + Spring + MyBatis + Oracle/MariaDB/Cubrid + Tomcat/JEUS
 # Claude Code 커스텀 슬래시 명령 경로: ~/.claude/commands/<name>.md
 SKILL_CONTENT = """\
 ---
-description: VibeGraph 바이브코딩 채점. start/report/end/list/dashboard/growth/coach 지원. report는 현재 대화 자동 채점+리포트.
-argument-hint: start <project> <task> | report | end | list | dashboard | growth | coach
+description: VibeGraph 바이브코딩 채점 + Domain Learning Card 관리. start/report/end/list/dashboard/growth/coach/learn 지원.
+argument-hint: start <project> <task> | report | end | list | dashboard | growth | coach | learn <list|show|done|reopen|add-reference|export|report>
 allowed-tools: [PowerShell, Read, Write]
 ---
 
@@ -240,13 +240,22 @@ allowed-tools: [PowerShell, Read, Write]
 
 **중요: vibe는 Windows 명령이므로 반드시 PowerShell 도구로 실행한다.**
 
-### start / end / list / stats / dashboard / growth / coach
+### start / end / list / stats / dashboard / growth / coach / learn
 
 PowerShell 도구로 실행 후 출력을 보여준다:
 
 ```powershell
 $env:PYTHONUTF8 = "1"; vibe $ARGUMENTS
 ```
+
+`learn` 명령 접근 경로:
+- Claude Code 창: `/vibe learn list`
+- 터미널: `vibe learn list`
+- 카드 보기: `vibe learn show <id>`
+- 완료 처리: `vibe learn done <id>`
+- 다시 열기: `vibe learn reopen <id>`
+- 참고 링크 추가: `vibe learn add-reference <id> --title "<제목>" --url "<URL>"`
+- Markdown 생성: `vibe learn export`
 
 ### report — 현재 대화 자동 채점 + 리포트 생성
 
@@ -344,6 +353,9 @@ $env:PYTHONUTF8 = "1"; vibe end
 ```
 
 완료 후 report.html 경로를 안내한다.
+Domain Learning Card가 저장되었으면 접근 경로도 함께 안내한다:
+- 터미널 > `vibe learn list`
+- Claude Code 창 > `/vibe learn list`
 
 ---
 
@@ -1038,6 +1050,14 @@ def cmd_learn(args):
         cmd_learn_list(args)
     elif action == "card":
         cmd_learn_card(args)
+    elif action == "show":
+        cmd_learn_card(args)
+    elif action == "done":
+        cmd_learn_status(args, "done")
+    elif action == "reopen":
+        cmd_learn_status(args, "open")
+    elif action == "add-reference":
+        cmd_learn_add_reference(args)
     elif action == "export":
         cmd_learn_export(args)
     elif action == "report":
@@ -1071,8 +1091,7 @@ def cmd_learn_card(args):
     if getattr(args, "last", False) or not card_id:
         card = vibe_learning.get_last_learning_card(ROOT)
     else:
-        cards = [c for c in vibe_learning.list_learning_cards(ROOT, status=None) if c["id"] == card_id]
-        card = cards[0] if cards else None
+        card = vibe_learning.get_learning_card(ROOT, card_id)
     if not card:
         print("\nLearning Card가 없습니다.")
         print("접근 경로: 터미널 > vibe learn list\n")
@@ -1081,6 +1100,39 @@ def cmd_learn_card(args):
     print()
     print(vibe_learning.render_learning_card_md(card, refs))
     print()
+
+
+def cmd_learn_status(args, status):
+    try:
+        card = vibe_learning.update_learning_card_status(ROOT, args.id, status)
+    except KeyError:
+        print(f"\nLearning Card를 찾을 수 없습니다: {args.id}")
+        print("접근 경로: 터미널 > vibe learn list --all\n")
+        sys.exit(1)
+    print(f"\n🧠  {card['id']} 상태를 {card['status']}로 변경했습니다.")
+    print("접근 경로: 터미널 > vibe learn list --all\n")
+
+
+def cmd_learn_add_reference(args):
+    try:
+        ref = vibe_learning.add_learning_reference(
+            ROOT,
+            args.id,
+            title=args.title,
+            url=args.url,
+            ref_type=args.type,
+            note=args.note or "",
+        )
+    except KeyError:
+        print(f"\nLearning Card를 찾을 수 없습니다: {args.id}")
+        print("접근 경로: 터미널 > vibe learn list --all\n")
+        sys.exit(1)
+    except ValueError as e:
+        print(f"\n참고 링크를 추가할 수 없습니다: {e}")
+        print("접근 경로: 터미널 > vibe learn add-reference <id> --title <제목> --url <URL>\n")
+        sys.exit(1)
+    print(f"\n🔗  참고 링크 추가: {ref['title']} ({ref['url']})")
+    print(f"접근 경로: 터미널 > vibe learn show {args.id}\n")
 
 
 def cmd_learn_export(args):
@@ -1170,10 +1222,15 @@ def _q(name: str) -> str:
     return f'"{name}"' if (" " in name) else name
 
 
-def generate_growth_html(sig: dict, all_projects=None, sel_project=None, weeks=None) -> str:
+def generate_growth_html(sig: dict, all_projects=None, sel_project=None, weeks=None, learning=None) -> str:
     n = sig["n"]
     overall = sig["overall"]
     all_projects = all_projects or []
+    if learning is None:
+        try:
+            learning = vibe_learning.learning_summary(ROOT)
+        except Exception:
+            learning = {"open": 0, "high_open": 0, "by_domain": {}, "review_candidates": []}
 
     # 현재 필터 배너
     fparts = []
@@ -1244,6 +1301,21 @@ def generate_growth_html(sig: dict, all_projects=None, sel_project=None, weeks=N
 
     weak_lbl = _CRIT_LABELS.get(sig["weakest"], "-") if sig["weakest"] else "-"
     imp_rows = "".join(f"<li>{_esc(t)}</li>" for t in sig["recent_imp"]) or "<li class='empty'>기록 없음</li>"
+    learn_domains = learning.get("by_domain", {}) or {}
+    learn_domain_rows = ""
+    for domain, count in sorted(learn_domains.items(), key=lambda x: (-x[1], x[0]))[:5]:
+        learn_domain_rows += f'<div class="line"><span>{_esc(domain)}</span><b>{count}개</b></div>'
+    if not learn_domain_rows:
+        learn_domain_rows = '<p class="empty">아직 Domain Learning 데이터가 없습니다.</p>'
+    learn_review_rows = ""
+    for card in learning.get("review_candidates", [])[:5]:
+        learn_review_rows += (
+            f'<div class="learn-line"><code>{_esc(card.get("id", ""))}</code>'
+            f'<span>{_esc(card.get("title", ""))}</span>'
+            f'<b>{_esc(card.get("domain", "Etc"))} · {card.get("severity", 0)}</b></div>'
+        )
+    if not learn_review_rows:
+        learn_review_rows = '<p class="empty">열린 복습 후보가 없습니다.</p>'
 
     return f"""<!DOCTYPE html>
 <html lang="ko"><head>
@@ -1273,6 +1345,12 @@ a{{color:#818cf8}}
 .sval{{font-size:13px;font-weight:600;color:#f8fafc;width:54px;text-align:right}}
 .line{{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #293548;font-size:13px;color:#cbd5e1}}
 .line:last-child{{border-bottom:none}} .line b{{color:#f8fafc}}
+.learn-line{{display:grid;grid-template-columns:190px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #293548;font-size:13px}}
+.learn-line:last-child{{border-bottom:none}}
+.learn-line code{{color:#99f6e4;background:#0b1120;border:1px solid #334155;border-radius:6px;padding:4px 7px;font-size:11px;white-space:nowrap}}
+.learn-line span{{color:#cbd5e1}}
+.learn-line b{{color:#f8fafc;font-size:12px;white-space:nowrap}}
+@media(max-width:720px){{.learn-line{{grid-template-columns:1fr}}}}
 .focus{{background:#ef444415;border:1px solid #ef444440;border-radius:10px;padding:16px 18px;margin-bottom:18px}}
 .focus b{{color:#fca5a5}}
 .imp{{margin:8px 0 0 18px;color:#cbd5e1;font-size:13px}} .imp li{{margin-bottom:5px}}
@@ -1299,6 +1377,8 @@ canvas{{max-height:240px}}
     <div class="kpi"><div class="v">{n}</div><div class="l">작업 수</div></div>
     <div class="kpi"><div class="v">{overall:.1f}</div><div class="l">전체 평균 점수</div></div>
     <div class="kpi"><div class="v" style="color:{trend_col}">{trend_txt}</div><div class="l">추세(전반부→후반부)</div></div>
+    <div class="kpi"><div class="v">{learning.get('open', 0)}</div><div class="l">열린 Learning Card</div></div>
+    <div class="kpi"><div class="v">{learning.get('high_open', 0)}</div><div class="l">높은 중요도 카드</div></div>
   </div>
 
   <div class="focus">🎯 <b>지금 가장 집중할 항목: {weak_lbl}</b> — 네 작업에서 평균적으로 가장 낮은 점수대 영역입니다.</div>
@@ -1320,6 +1400,11 @@ canvas{{max-height:240px}}
   <div class="card" style="margin-top:18px">
     <h3>🔑 최근 개선포인트 모음</h3>
     <ul class="imp">{imp_rows}</ul>
+  </div>
+
+  <div class="g2" style="margin-top:18px">
+    <div class="card"><h3>🧠 Domain Learning · 도메인 분포</h3>{learn_domain_rows}</div>
+    <div class="card"><h3>🧠 Domain Learning · 5분 복습 후보</h3>{learn_review_rows}</div>
   </div>
 
   <div class="card" style="margin-top:18px">
@@ -1388,7 +1473,10 @@ def cmd_growth(args):
 
     sig = _compute_signals(flt)
     out = ROOT / "growth.html"
-    out.write_text(generate_growth_html(sig, all_projects, sel_project, weeks), encoding="utf-8")
+    out.write_text(
+        generate_growth_html(sig, all_projects, sel_project, weeks, vibe_learning.learning_summary(ROOT)),
+        encoding="utf-8",
+    )
     cond_txt = ""
     if sel_project or weeks:
         bits = ([f"프로젝트 {sel_project}"] if sel_project else []) + ([f"최근 {weeks}주"] if weeks else [])
@@ -1820,6 +1908,22 @@ def main():
     plc = learn_sub.add_parser("card", help="Learning Card 본문 출력")
     plc.add_argument("id", nargs="?", help="카드 ID")
     plc.add_argument("--last", action="store_true", help="가장 최근 카드 출력")
+
+    pls = learn_sub.add_parser("show", help="Learning Card 본문 출력")
+    pls.add_argument("id", help="카드 ID")
+
+    pld = learn_sub.add_parser("done", help="Learning Card를 완료 처리")
+    pld.add_argument("id", help="카드 ID")
+
+    plr = learn_sub.add_parser("reopen", help="Learning Card를 open 상태로 되돌리기")
+    plr.add_argument("id", help="카드 ID")
+
+    plref = learn_sub.add_parser("add-reference", help="Learning Card에 참고 링크 추가")
+    plref.add_argument("id", help="카드 ID")
+    plref.add_argument("--title", required=True, help="참고 링크 제목")
+    plref.add_argument("--url", required=True, help="참고 링크 URL 또는 file 경로")
+    plref.add_argument("--type", default="etc", help="reference 타입 (기본: etc)")
+    plref.add_argument("--note", default="", help="참고 링크 메모")
 
     learn_sub.add_parser("export", help="LEARNINGS.generated.md 생성/갱신")
     learn_sub.add_parser("report", help="학습 요약 리포트 출력")

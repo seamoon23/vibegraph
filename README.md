@@ -152,7 +152,12 @@ vibe end                         # 리포트(report.html) 생성 + 조회/성장
 | `vibe growth` | 성장 리포트 — 기본 **최근 2주** (`--all` 전체 · `--weeks N` · `--project <이름>`) |
 | `vibe coach` | 누적 신호 기반 코칭 프롬프트 복사 |
 | `vibe learn list` | 열린 Domain Learning Card 목록 |
+| `vibe learn list --all` | 완료된 카드까지 포함해 전체 Learning Card 목록 |
+| `vibe learn show <id>` | 특정 Learning Card 본문 출력 |
 | `vibe learn card --last` | 가장 최근 Learning Card 본문 출력 |
+| `vibe learn done <id>` | Learning Card 완료 처리 |
+| `vibe learn reopen <id>` | 완료한 Learning Card를 다시 open 상태로 변경 |
+| `vibe learn add-reference <id> --title <제목> --url <URL>` | 카드에 참고 링크 추가 |
 | `vibe learn export` | `LEARNINGS.generated.md` 생성/갱신 |
 | `vibe learn report` | 도메인별/상태별/중요도별 학습 요약 출력 |
 | `vibe install-skill` | Claude Code 슬래시 명령 설치 (`~/.claude/commands/vibe.md`) |
@@ -164,7 +169,11 @@ vibe end                         # 리포트(report.html) 생성 + 조회/성장
 작업이 끝난 뒤 터미널에서 `vibe report` 또는 `vibe end`를 실행하면, 기존 AI 협업 평가와 함께 `domain_learning.learning_signals`가 있으면 자동으로 Learning Card가 저장됩니다.
 
 - 조회 경로: 터미널 > `vibe learn list`
+- Claude Code 경로: Claude Code 창 > `/vibe learn list`
 - 최근 카드 보기: 터미널 > `vibe learn card --last`
+- 특정 카드 보기: 터미널 > `vibe learn show <id>`
+- 완료 처리: 터미널 > `vibe learn done <id>`
+- 참고 링크 추가: 터미널 > `vibe learn add-reference <id> --title "<제목>" --url "<URL>"`
 - Markdown 내보내기: 터미널 > `vibe learn export`
 - 요약 리포트: 터미널 > `vibe learn report`
 

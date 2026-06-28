@@ -1,6 +1,6 @@
 ---
-description: VibeGraph 바이브코딩 채점. start/report/end/list/dashboard/growth/coach 지원. report는 현재 대화 자동 채점+리포트.
-argument-hint: start <project> <task> | report | end | list | dashboard | growth | coach
+description: VibeGraph 바이브코딩 채점 + Domain Learning Card 관리. start/report/end/list/dashboard/growth/coach/learn 지원.
+argument-hint: start <project> <task> | report | end | list | dashboard | growth | coach | learn <list|show|done|reopen|add-reference|export|report>
 allowed-tools: [PowerShell, Read, Write]
 ---
 
@@ -16,13 +16,22 @@ allowed-tools: [PowerShell, Read, Write]
 
 **중요: vibe는 Windows 명령이므로 반드시 PowerShell 도구로 실행한다.**
 
-### start / end / list / stats / dashboard / growth / coach
+### start / end / list / stats / dashboard / growth / coach / learn
 
 PowerShell 도구로 실행 후 출력을 보여준다:
 
 ```powershell
 $env:PYTHONUTF8 = "1"; vibe $ARGUMENTS
 ```
+
+`learn` 명령 접근 경로:
+- Claude Code 창: `/vibe learn list`
+- 터미널: `vibe learn list`
+- 카드 보기: `vibe learn show <id>`
+- 완료 처리: `vibe learn done <id>`
+- 다시 열기: `vibe learn reopen <id>`
+- 참고 링크 추가: `vibe learn add-reference <id> --title "<제목>" --url "<URL>"`
+- Markdown 생성: `vibe learn export`
 
 ### report — 현재 대화 자동 채점 + 리포트 생성
 
@@ -58,6 +67,14 @@ $env:PYTHONUTF8 = "1"; python -c "import os,json; from pathlib import Path; r=Pa
 `"Missing Context"`, `"Vague Instruction"`, `"Scope Creep"`, `"Patch Acceptance"`,
 `"Repeat Question"`, `"Over-specification"`, `"Environment Mismatch"`, `"Tool Misuse"`
 
+**Domain Learning 추가 분석:**
+
+이번 대화에서 드러난 개발/DB/인프라/업무도메인 지식 공백을 찾아라.
+단순 오타나 일회성 실수는 제외하고, 다음 작업의 정확도/속도/장애대응에 영향을 주는 것만 추출한다.
+프롬프트 문제(`prompt_gap`)와 도메인 지식 문제(`concept_gap`, `error_pattern`, `tool_gap`, `environment_gap`, `domain_gap`, `decision_gap`)를 구분한다.
+각 Learning Signal은 하루 5~10분 안에 복습 가능한 작은 카드가 되어야 한다.
+확실한 공식문서/대표 자료가 있을 때만 `references`에 넣고, 확실하지 않으면 빈 배열로 둔다. URL을 지어내지 마라.
+
 **Step 3 — result.json 기록:**
 
 Step 1에서 읽은 session JSON의 `task_dir` 값 경로에 `result.json`을 Write 도구로 저장.
@@ -80,6 +97,25 @@ Step 1에서 읽은 session JSON의 `task_dir` 값 경로에 `result.json`을 Wr
   "skill_recommendations": [
     {"situation": "작업 상황", "used_approach": "사용한 방식", "better_skill": "더 나은 도구/방법", "reason": "이유"}
   ],
+  "domain_learning": {
+    "session_learning_summary": "이번 세션에서 드러난 도메인 지식 공백 요약",
+    "learning_signals": [
+      {
+        "id": "LC-YYYYMMDD-topic",
+        "domain": "Java|Spring|MyBatis|Oracle|CUBRID|SQL|Linux|Docker|Tomcat|JEUS|JBoss|Jenkins|Network|React|TypeScript|AI-Collaboration|Business-Domain|Etc",
+        "type": "concept_gap|error_pattern|tool_gap|environment_gap|domain_gap|prompt_gap|decision_gap",
+        "title": "5~10분 복습 카드 제목",
+        "evidence": "대화에서 이 공백이 드러난 구체적 근거",
+        "severity": 1,
+        "recurrence": 1,
+        "confidence": "low|medium|high",
+        "micro_summary": "핵심 개념 1줄 요약",
+        "micro_goal": "다음 작업 전에 5분 안에 설명할 수 있어야 할 목표",
+        "self_checkpoints": ["다음 작업 시 확인할 질문"],
+        "references": []
+      }
+    ]
+  },
   "summary": "전체 요약 2~3문장",
   "top_improvement": "가장 중요한 개선점 1가지"
 }
@@ -93,3 +129,17 @@ $env:PYTHONUTF8 = "1"; vibe end
 ```
 
 완료 후 report.html 경로를 안내한다.
+Domain Learning Card가 저장되었으면 접근 경로도 함께 안내한다:
+- 터미널 > `vibe learn list`
+- Claude Code 창 > `/vibe learn list`
+
+---
+
+## VibeGraph CLI 미설치 시
+
+```powershell
+pip install git+https://github.com/seamoon23/vibegraph.git
+vibe install-skill
+```
+
+설치 후 VS Code를 **완전히 재시작**해야 `/vibe` 명령이 인식됩니다.
