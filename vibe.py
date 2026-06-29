@@ -1854,6 +1854,16 @@ def _date_arg(value: str) -> str:
         raise argparse.ArgumentTypeError("date must be YYYY-MM-DD") from None
 
 
+def _positive_int_arg(value: str) -> int:
+    try:
+        parsed = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError("value must be a positive integer") from None
+    if parsed <= 0:
+        raise argparse.ArgumentTypeError("value must be a positive integer")
+    return parsed
+
+
 def generate_report_html(data: dict) -> str:
     scores = data["scores"]
     grade = data["grade"]
@@ -2149,7 +2159,7 @@ def main():
     pll.add_argument("--type", help="특정 Learning Signal 타입만 조회")
     pll.add_argument("--severity", type=int, help="최소 severity")
     pll.add_argument("--search", help="제목/근거/요약 검색어")
-    pll.add_argument("--limit", type=int, help="최대 표시 개수")
+    pll.add_argument("--limit", type=_positive_int_arg, help="최대 표시 개수")
     pll.add_argument("--sort", choices=["created", "severity", "domain"], default="created", help="정렬 기준 (기본: created)")
     pll.add_argument("--due", action="store_true", help="next_review_at이 오늘 이전인 복습 대상만 조회")
     pll.add_argument("--as-of", type=_date_arg, help="복습 기준일 YYYY-MM-DD (기본: 오늘)")

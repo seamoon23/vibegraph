@@ -268,6 +268,10 @@ class VibeCliLearningTests(unittest.TestCase):
         listed_cards = [line for line in limited.stdout.splitlines() if line.strip().startswith("LC-")]
         self.assertEqual(len(listed_cards), 1)
 
+        invalid_limit = self.run_vibe("learn", "list", "--limit", "0")
+        self.assertNotEqual(invalid_limit.returncode, 0)
+        self.assertIn("positive integer", invalid_limit.stderr)
+
         listed_json = self.run_vibe("learn", "list", "--all", "--limit", "1", "--json")
         self.assertEqual(listed_json.returncode, 0, listed_json.stdout + listed_json.stderr)
         listed_payload = json.loads(listed_json.stdout)
