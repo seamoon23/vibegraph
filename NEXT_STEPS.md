@@ -31,6 +31,7 @@ The next local changes after `e0fe60f` add:
 - Quick backlog stats through `vibe learn stats`.
 - JSON backlog stats through `vibe learn stats --json`.
 - Next-card review handoff through `vibe learn next` and `vibe learn next --json`.
+- Dashboard and growth review candidates now follow the same due-first priority as `vibe learn next`.
 - Release notes in `CHANGELOG.md`.
 
 ## Release Readiness Checklist

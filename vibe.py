@@ -850,6 +850,7 @@ def generate_index_html(items: list, learning=None) -> str:
       </div>
       <div class="learn-actions">
         <code>vibe learn list</code>
+        <code>vibe learn next</code>
         <code>vibe learn list --status archived</code>
         <code>vibe learn export</code>
       </div>
@@ -1634,7 +1635,7 @@ canvas{{max-height:240px}}
 
   <div class="g2" style="margin-top:18px">
     <div class="card"><h3>🧠 Domain Learning · 도메인 분포</h3>{learn_domain_rows}</div>
-    <div class="card"><h3>🧠 Domain Learning · 5분 복습 후보</h3>{learn_review_rows}</div>
+    <div class="card"><h3>🧠 Domain Learning · 5분 복습 후보</h3><p class="empty"><code>vibe learn next</code> 로 다음 복습 카드를 바로 열 수 있습니다.</p>{learn_review_rows}</div>
   </div>
 
   <div class="card" style="margin-top:18px">

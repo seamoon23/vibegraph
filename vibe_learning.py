@@ -707,7 +707,7 @@ def render_learning_report(root: Path) -> str:
     return "\n".join(lines)
 
 
-def learning_summary(root: Path) -> dict[str, Any]:
+def learning_summary(root: Path, as_of: str | None = None) -> dict[str, Any]:
     if not learnings_db_path(root).exists():
         return {
             "total": 0,
@@ -722,16 +722,21 @@ def learning_summary(root: Path) -> dict[str, Any]:
     by_domain: dict[str, int] = {}
     for card in cards:
         by_domain[card["domain"]] = by_domain.get(card["domain"], 0) + 1
+    review_candidates = list_learning_cards(root, status="open", due=True, as_of=as_of, limit=5)
+    if len(review_candidates) < 5:
+        seen = {card["id"] for card in review_candidates}
+        fallback = [
+            card
+            for card in list_learning_cards(root, status="open", sort_mode="severity")
+            if card["id"] not in seen
+        ]
+        review_candidates.extend(fallback[: 5 - len(review_candidates)])
     return {
         "total": len(cards),
         "open": len(open_cards),
         "high_open": len(high_open),
         "by_domain": by_domain,
-        "review_candidates": sorted(
-            open_cards,
-            key=lambda c: (_as_int(c.get("severity")), c.get("created_at", "")),
-            reverse=True,
-        )[:5],
+        "review_candidates": review_candidates,
     }
 
 

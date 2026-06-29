@@ -44,6 +44,7 @@ class GrowthLearningTests(unittest.TestCase):
 
         self.assertIn("Domain Learning", html)
         self.assertIn("열린 Learning Card", html)
+        self.assertIn("vibe learn next", html)
         self.assertIn("Docker container log triage", html)
 
 

@@ -298,6 +298,35 @@ class LearningLayerTests(unittest.TestCase):
         fallback_next = vibe_learning.get_next_learning_card(self.root, as_of="2026-06-27")
         self.assertEqual(fallback_next["id"], "LC-20260628-high-future")
 
+    def test_learning_summary_review_candidates_follow_next_card_priority(self):
+        summary_result = json.loads(json.dumps(self.result))
+        summary_result["domain_learning"]["learning_signals"] = [
+            {
+                "id": "LC-20260628-low-due",
+                "domain": "Docker",
+                "type": "tool_gap",
+                "title": "Low due card",
+                "severity": 2,
+                "next_review_at": "2026-06-28",
+            },
+            {
+                "id": "LC-20260628-high-future",
+                "domain": "Oracle",
+                "type": "concept_gap",
+                "title": "High future card",
+                "severity": 5,
+                "next_review_at": "2026-07-02",
+            },
+        ]
+        vibe_learning.ingest_learning_result(self.root, self.session, summary_result, self.task_dir)
+
+        summary = vibe_learning.learning_summary(self.root, as_of="2026-06-28")
+
+        self.assertEqual(
+            [card["id"] for card in summary["review_candidates"]],
+            ["LC-20260628-low-due", "LC-20260628-high-future"],
+        )
+
     def test_init_learnings_db_adds_next_review_column_to_legacy_db(self):
         db_path = vibe_learning.learnings_db_path(self.root)
         with sqlite3.connect(db_path) as con:

@@ -48,6 +48,7 @@ class DashboardLearningTests(unittest.TestCase):
         self.assertIn("Domain Learning", html)
         self.assertIn("열린 Learning Card", html)
         self.assertIn("LC-20260628-docker-logs", html)
+        self.assertIn("vibe learn next", html)
         self.assertIn("vibe learn show LC-20260628-docker-logs", html)
         self.assertIn("vibe learn archive LC-20260628-docker-logs", html)
         self.assertIn("vibe learn list --status archived", html)

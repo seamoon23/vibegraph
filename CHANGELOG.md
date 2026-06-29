@@ -66,6 +66,7 @@ Branch: `feature/domain-learning-layer-mvp`
   - Due open cards are selected first, then highest-severity open cards.
   - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next`
   - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next --json`
+- Aligned dashboard and growth review candidates with the same due-first priority as `vibe learn next`.
 - Hardened legacy `learnings.db` migration so old rows expose blank `next_review_at` values and can still be listed, shown, and scheduled.
 
 ### Safety Notes
