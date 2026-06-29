@@ -255,12 +255,14 @@ $env:PYTHONUTF8 = "1"; vibe $ARGUMENTS
 - 제한 조회: `vibe learn list --limit 5`
 - 정렬 조회: `vibe learn list --sort severity`
 - 복습 대상 조회: `vibe learn list --due`
+- 기준일 복습 조회: `vibe learn list --due --as-of 2026-07-01`
 - JSON 목록 조회: `vibe learn list --all --json`
 - 수동 카드 생성: `vibe learn add --domain "<도메인>" --type "<타입>" --title "<제목>"`
 - 카드 보기: `vibe learn show <id>`
 - JSON 카드 보기: `vibe learn show <id> --json`
 - 다음 카드 보기: `vibe learn next`
 - 다음 카드 JSON: `vibe learn next --json`
+- 기준일 다음 카드 JSON: `vibe learn next --as-of 2026-07-01 --json`
 - 완료 처리: `vibe learn done <id>`
 - 보관 처리: `vibe learn archive <id>`
 - 복습일 설정: `vibe learn schedule <id> --date 2026-07-01`
@@ -1197,6 +1199,7 @@ def cmd_learn_list(args):
         limit=getattr(args, "limit", None),
         sort_mode=getattr(args, "sort", "created"),
         due=getattr(args, "due", False),
+        as_of=getattr(args, "as_of", None),
     )
     if getattr(args, "json", False):
         print(json.dumps(cards, ensure_ascii=False, indent=2))
@@ -1243,7 +1246,7 @@ def cmd_learn_card(args):
 
 
 def cmd_learn_next(args):
-    card = vibe_learning.get_next_learning_card(ROOT)
+    card = vibe_learning.get_next_learning_card(ROOT, as_of=getattr(args, "as_of", None))
     if not card:
         print("\nLearning Card가 없습니다.")
         print("접근 경로: 터미널 > vibe learn list\n")
@@ -2142,6 +2145,7 @@ def main():
     pll.add_argument("--limit", type=int, help="최대 표시 개수")
     pll.add_argument("--sort", choices=["created", "severity", "domain"], default="created", help="정렬 기준 (기본: created)")
     pll.add_argument("--due", action="store_true", help="next_review_at이 오늘 이전인 복습 대상만 조회")
+    pll.add_argument("--as-of", help="복습 기준일 YYYY-MM-DD (기본: 오늘)")
     pll.add_argument("--json", action="store_true", help="JSON 형식으로 출력")
 
     plc = learn_sub.add_parser("card", help="Learning Card 본문 출력")
@@ -2154,6 +2158,7 @@ def main():
     pls.add_argument("--json", action="store_true", help="JSON 형식으로 출력")
 
     plnext = learn_sub.add_parser("next", help="다음에 볼 Learning Card 출력")
+    plnext.add_argument("--as-of", help="복습 기준일 YYYY-MM-DD (기본: 오늘)")
     plnext.add_argument("--json", action="store_true", help="JSON 형식으로 출력")
 
     pld = learn_sub.add_parser("done", help="Learning Card를 완료 처리")

@@ -31,12 +31,14 @@ $env:PYTHONUTF8 = "1"; vibe $ARGUMENTS
 - 제한 조회: `vibe learn list --limit 5`
 - 정렬 조회: `vibe learn list --sort severity`
 - 복습 대상 조회: `vibe learn list --due`
+- 기준일 복습 조회: `vibe learn list --due --as-of 2026-07-01`
 - JSON 목록 조회: `vibe learn list --all --json`
 - 수동 카드 생성: `vibe learn add --domain "<도메인>" --type "<타입>" --title "<제목>"`
 - 카드 보기: `vibe learn show <id>`
 - JSON 카드 보기: `vibe learn show <id> --json`
 - 다음 카드 보기: `vibe learn next`
 - 다음 카드 JSON: `vibe learn next --json`
+- 기준일 다음 카드 JSON: `vibe learn next --as-of 2026-07-01 --json`
 - 완료 처리: `vibe learn done <id>`
 - 보관 처리: `vibe learn archive <id>`
 - 복습일 설정: `vibe learn schedule <id> --date 2026-07-01`

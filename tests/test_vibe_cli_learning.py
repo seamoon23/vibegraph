@@ -154,6 +154,10 @@ class VibeCliLearningTests(unittest.TestCase):
         self.assertEqual(due_payload[0]["next_review_at"], "2026-06-28")
         self.assertNotIn("next_review_at=", due_json.stdout)
 
+        due_before_review = self.run_vibe("learn", "list", "--due", "--as-of", "2026-06-27", "--json")
+        self.assertEqual(due_before_review.returncode, 0, due_before_review.stdout + due_before_review.stderr)
+        self.assertEqual(json.loads(due_before_review.stdout), [])
+
         next_card = self.run_vibe("learn", "next")
         self.assertEqual(next_card.returncode, 0, next_card.stdout + next_card.stderr)
         self.assertIn("LC-20260628-docker-logs", next_card.stdout)
@@ -227,6 +231,12 @@ class VibeCliLearningTests(unittest.TestCase):
         )
         self.assertEqual(manual.returncode, 0, manual.stdout + manual.stderr)
         self.assertIn("Oracle grants checklist", manual.stdout)
+
+        next_as_of = self.run_vibe("learn", "next", "--as-of", "2026-06-30", "--json")
+        self.assertEqual(next_as_of.returncode, 0, next_as_of.stdout + next_as_of.stderr)
+        next_as_of_payload = json.loads(next_as_of.stdout)
+        self.assertEqual(next_as_of_payload["domain"], "Oracle")
+        self.assertEqual(next_as_of_payload["severity"], 5)
 
         filtered = self.run_vibe(
             "learn",

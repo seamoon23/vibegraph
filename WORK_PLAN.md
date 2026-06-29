@@ -23,6 +23,7 @@
 - Learning Card lifecycle: `done`, `reopen`, non-destructive `archive`, and archived list review.
 - Review workflow controls: `--limit`, `--sort`, `--due`, and `schedule --date YYYY-MM-DD`.
 - Review handoff: `vibe learn next` selects due open cards first, then highest-severity open cards.
+- Deterministic review checks: `--as-of YYYY-MM-DD` is available on `vibe learn list --due` and `vibe learn next`.
 - Automation outputs: `vibe learn list --json`, `vibe learn show --json`, `vibe learn next --json`, and `vibe learn stats --json`.
 - Manual backlog support: `vibe learn add` and `vibe learn add-reference`.
 - Compatibility: legacy `learnings.db` migration adds `next_review_at` and keeps old rows listable/schedulable.

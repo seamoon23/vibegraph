@@ -157,12 +157,14 @@ vibe end                         # 리포트(report.html) 생성 + 조회/성장
 | `vibe learn list --limit 5` | Learning Card 표시 개수 제한 |
 | `vibe learn list --sort severity` | Learning Card 정렬 (`created`, `severity`, `domain`) |
 | `vibe learn list --due` | `next_review_at` 기준 복습 기한이 지난 open 카드 조회 |
+| `vibe learn list --due --as-of YYYY-MM-DD` | 지정한 기준일로 복습 대상 조회 |
 | `vibe learn list --all --json` | Learning Card 목록을 JSON으로 출력 |
 | `vibe learn add --domain <도메인> --type <타입> --title <제목>` | 수동 Learning Card 생성 |
 | `vibe learn show <id>` | 특정 Learning Card 본문 출력 |
 | `vibe learn show <id> --json` | 특정 Learning Card를 JSON으로 출력 |
 | `vibe learn next` | 다음에 볼 Learning Card 출력 |
 | `vibe learn next --json` | 다음에 볼 Learning Card를 JSON으로 출력 |
+| `vibe learn next --as-of YYYY-MM-DD --json` | 지정한 기준일로 다음 Learning Card를 JSON 출력 |
 | `vibe learn card --last` | 가장 최근 Learning Card 본문 출력 |
 | `vibe learn done <id>` | Learning Card 완료 처리 |
 | `vibe learn archive <id>` | Learning Card를 삭제하지 않고 archived 상태로 보관 |
@@ -186,6 +188,7 @@ vibe end                         # 리포트(report.html) 생성 + 조회/성장
 - 제한 조회: 터미널 > `vibe learn list --limit 5`
 - 정렬 조회: 터미널 > `vibe learn list --sort severity`
 - 복습 대상 조회: 터미널 > `vibe learn list --due`
+- 기준일 복습 조회: PowerShell 또는 Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn list --due --as-of 2026-07-01`
 - JSON 목록 조회: 터미널 > `vibe learn list --all --json`
 - 수동 카드 생성: 터미널 > `vibe learn add --domain Docker --type tool_gap --title "Docker log triage"`
 - Claude Code 경로: Claude Code 창 > `/vibe learn list`
@@ -194,6 +197,7 @@ vibe end                         # 리포트(report.html) 생성 + 조회/성장
 - JSON 카드 보기: 터미널 > `vibe learn show <id> --json`
 - 다음 카드 보기: PowerShell 또는 Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next`
 - 다음 카드 JSON: PowerShell 또는 Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next --json`
+- 기준일 다음 카드 JSON: PowerShell 또는 Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next --as-of 2026-07-01 --json`
 - 완료 처리: 터미널 > `vibe learn done <id>`
 - 보관 처리: 터미널 > `vibe learn archive <id>`
 - 복습일 설정: 터미널 > `vibe learn schedule <id> --date 2026-07-01`

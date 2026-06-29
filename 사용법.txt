@@ -83,6 +83,8 @@
                          Learning Card 정렬(created/severity/domain)
   vibe learn list --due
                          next_review_at 기준 복습 대상 조회
+  vibe learn list --due --as-of YYYY-MM-DD
+                         지정한 기준일로 복습 대상 조회
   vibe learn list --all --json
                          Learning Card 목록을 JSON으로 출력
   vibe learn add --domain Docker --type tool_gap --title "Docker log triage"
@@ -92,6 +94,8 @@
                          특정 Learning Card를 JSON으로 출력
   vibe learn next        다음에 볼 Learning Card 출력
   vibe learn next --json 다음에 볼 Learning Card를 JSON으로 출력
+  vibe learn next --as-of YYYY-MM-DD --json
+                         지정한 기준일로 다음 Learning Card를 JSON으로 출력
   vibe learn done <id>   Learning Card 완료 처리
   vibe learn archive <id>
                          Learning Card를 삭제하지 않고 archived 상태로 보관
@@ -190,12 +194,14 @@
     - 터미널 > vibe learn list --limit 5
     - 터미널 > vibe learn list --sort severity
     - 터미널 > vibe learn list --due
+    - PowerShell 또는 Windows Terminal > cd C:\codex\app\vibegraph > vibe learn list --due --as-of 2026-07-01
     - 터미널 > vibe learn list --all --json
     - 터미널 > vibe learn add --domain Docker --type tool_gap --title "Docker log triage"
     - 터미널 > vibe learn show <id>
     - 터미널 > vibe learn show <id> --json
     - PowerShell 또는 Windows Terminal > cd C:\codex\app\vibegraph > vibe learn next
     - PowerShell 또는 Windows Terminal > cd C:\codex\app\vibegraph > vibe learn next --json
+    - PowerShell 또는 Windows Terminal > cd C:\codex\app\vibegraph > vibe learn next --as-of 2026-07-01 --json
     - 터미널 > vibe learn done <id>
     - 터미널 > vibe learn archive <id>
     - 터미널 > vibe learn schedule <id> --date 2026-07-01

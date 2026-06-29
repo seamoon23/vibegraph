@@ -22,6 +22,7 @@ The next local changes after `e0fe60f` add:
 - `vibe learn list --limit 5` for focused terminal review.
 - `vibe learn list --sort severity` for prioritized terminal review.
 - `vibe learn list --due` for due-review terminal review.
+- `vibe learn list --due --as-of YYYY-MM-DD` for deterministic due-review smoke checks.
 - `vibe learn schedule <id> --date YYYY-MM-DD` for explicit review-date scheduling.
 - `vibe learn list --all --json` for automation-friendly list export.
 - Legacy `learnings.db` compatibility for `next_review_at`.
@@ -31,6 +32,7 @@ The next local changes after `e0fe60f` add:
 - Quick backlog stats through `vibe learn stats`.
 - JSON backlog stats through `vibe learn stats --json`.
 - Next-card review handoff through `vibe learn next` and `vibe learn next --json`.
+- Deterministic next-card checks through `vibe learn next --as-of YYYY-MM-DD --json`.
 - Dashboard and growth review candidates now follow the same due-first priority as `vibe learn next`.
 - Release notes in `CHANGELOG.md`.
 
@@ -49,7 +51,7 @@ The next local changes after `e0fe60f` add:
 
 3. Optional CLI smoke path for a fresh local data home.
    - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph`
-   - Set a temporary `VIBE_HOME`, run a small `vibe report` / `vibe end` fixture, then verify `vibe learn list`, `vibe learn list --limit 5`, `vibe learn list --sort severity`, `vibe learn list --due`, `vibe learn list --all --json`, `vibe learn show <id>`, `vibe learn show <id> --json`, `vibe learn next`, `vibe learn next --json`, `vibe learn schedule <id> --date 2026-07-01`, `vibe learn done <id>`, `vibe learn archive <id>`, `vibe learn list --status archived`, `vibe learn reopen <id>`, `vibe learn add-reference <id> --title "<title>" --url "<url>"`, `vibe learn stats`, `vibe learn stats --json`, and `vibe learn export`.
+   - Set a temporary `VIBE_HOME`, run a small `vibe report` / `vibe end` fixture, then verify `vibe learn list`, `vibe learn list --limit 5`, `vibe learn list --sort severity`, `vibe learn list --due`, `vibe learn list --due --as-of 2026-07-01`, `vibe learn list --all --json`, `vibe learn show <id>`, `vibe learn show <id> --json`, `vibe learn next`, `vibe learn next --json`, `vibe learn next --as-of 2026-07-01 --json`, `vibe learn schedule <id> --date 2026-07-01`, `vibe learn done <id>`, `vibe learn archive <id>`, `vibe learn list --status archived`, `vibe learn reopen <id>`, `vibe learn add-reference <id> --title "<title>" --url "<url>"`, `vibe learn stats`, `vibe learn stats --json`, and `vibe learn export`.
 
 4. Prepare branch publication if requested.
    - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `git log --oneline --decorate -n 5`
@@ -65,6 +67,7 @@ The next local changes after `e0fe60f` add:
 - Sort cards: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn list --sort severity`
 - Due cards: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn list --due`
   - Output includes `next_review_at=YYYY-MM-DD` beside each due card.
+- Due cards as of date: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn list --due --as-of 2026-07-01`
 - Schedule card: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn schedule <id> --date 2026-07-01`
 - List JSON: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn list --all --json`
 - Create manual card: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn add --domain Docker --type tool_gap --title "Docker log triage"`
@@ -73,6 +76,7 @@ The next local changes after `e0fe60f` add:
 - Card detail JSON: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn show <id> --json`
 - Next review card: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next`
 - Next review card JSON: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next --json`
+- Next review card as of date JSON: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next --as-of 2026-07-01 --json`
 - Mark done: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn done <id>`
 - Archive: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn archive <id>`
 - Archived list: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn list --status archived`
@@ -110,4 +114,4 @@ Install-verification fallback smoke access path:
 3. PowerShell or Windows Terminal > `python vibe.py learn add --domain Docker --type tool_gap --title "Docker smoke card" --severity 4`
 4. PowerShell or Windows Terminal > `python vibe.py learn list --all --json`
 5. PowerShell or Windows Terminal > `python vibe.py learn schedule <id> --date 2026-07-01`
-6. PowerShell or Windows Terminal > `python vibe.py learn list --due`
+6. PowerShell or Windows Terminal > `python vibe.py learn list --due --as-of 2026-07-01`
