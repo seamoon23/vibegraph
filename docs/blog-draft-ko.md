@@ -96,6 +96,9 @@ CLI는 폴더 정리·HTML 생성·통계만 담당하고, **외부 API를 일�
    vibe prompt        # 채점 프롬프트 복사 → Claude 창에 붙여넣기 → JSON을 result.json 에 저장
    vibe end           # 리포트 생성
    vibe growth        # 성장 추세 보기
+   vibe learn list    # Domain Learning Card 확인
+   vibe learn next    # 오늘 볼 다음 Learning Card 확인
+   vibe learn stats --json  # 자동화용 Learning Card 집계
    ```
 
 > Python 3.8+ 필요(설치 시 "Add Python to PATH" 체크). 설치 후 `vibe`가 안 잡히면 VS Code를 완전히 재시작하세요.

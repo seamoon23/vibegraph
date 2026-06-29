@@ -154,14 +154,25 @@ vibe end                         # 리포트(report.html) 생성 + 조회/성장
 | `vibe learn list` | 열린 Domain Learning Card 목록 |
 | `vibe learn list --all` | 완료된 카드까지 포함해 전체 Learning Card 목록 |
 | `vibe learn list --domain <도메인> --type <타입> --severity 4 --search <검색어>` | 조건으로 Learning Card 필터 |
+| `vibe learn list --limit 5` | Learning Card 표시 개수 제한 |
+| `vibe learn list --sort severity` | Learning Card 정렬 (`created`, `severity`, `domain`) |
+| `vibe learn list --due` | `next_review_at` 기준 복습 기한이 지난 open 카드 조회 |
+| `vibe learn list --all --json` | Learning Card 목록을 JSON으로 출력 |
 | `vibe learn add --domain <도메인> --type <타입> --title <제목>` | 수동 Learning Card 생성 |
 | `vibe learn show <id>` | 특정 Learning Card 본문 출력 |
+| `vibe learn show <id> --json` | 특정 Learning Card를 JSON으로 출력 |
+| `vibe learn next` | 다음에 볼 Learning Card 출력 |
+| `vibe learn next --json` | 다음에 볼 Learning Card를 JSON으로 출력 |
 | `vibe learn card --last` | 가장 최근 Learning Card 본문 출력 |
 | `vibe learn done <id>` | Learning Card 완료 처리 |
+| `vibe learn archive <id>` | Learning Card를 삭제하지 않고 archived 상태로 보관 |
+| `vibe learn schedule <id> --date YYYY-MM-DD` | Learning Card 복습 날짜 설정 |
 | `vibe learn reopen <id>` | 완료한 Learning Card를 다시 open 상태로 변경 |
 | `vibe learn add-reference <id> --title <제목> --url <URL>` | 카드에 참고 링크 추가 |
 | `vibe learn export` | `LEARNINGS.generated.md` 생성/갱신 |
 | `vibe learn report` | 도메인별/상태별/중요도별 학습 요약 출력 |
+| `vibe learn stats` | Learning Card 짧은 집계 출력 |
+| `vibe learn stats --json` | Learning Card 짧은 집계를 JSON으로 출력 |
 | `vibe install-skill` | Claude Code 슬래시 명령 설치 (`~/.claude/commands/vibe.md`) |
 
 > ⏱ **성장 리포트 기본 기간이 "최근 2주"인 이유**: 전체를 기본으로 하면 작업이 쌓일수록 집계가 느려지고 추세 차트가 복잡해집니다. 전체 흐름은 `vibe growth --all` 로 확인하세요.
@@ -172,14 +183,26 @@ vibe end                         # 리포트(report.html) 생성 + 조회/성장
 
 - 조회 경로: 터미널 > `vibe learn list`
 - 필터 조회: 터미널 > `vibe learn list --all --domain Docker --type tool_gap --severity 4 --search logs`
+- 제한 조회: 터미널 > `vibe learn list --limit 5`
+- 정렬 조회: 터미널 > `vibe learn list --sort severity`
+- 복습 대상 조회: 터미널 > `vibe learn list --due`
+- JSON 목록 조회: 터미널 > `vibe learn list --all --json`
 - 수동 카드 생성: 터미널 > `vibe learn add --domain Docker --type tool_gap --title "Docker log triage"`
 - Claude Code 경로: Claude Code 창 > `/vibe learn list`
 - 최근 카드 보기: 터미널 > `vibe learn card --last`
 - 특정 카드 보기: 터미널 > `vibe learn show <id>`
+- JSON 카드 보기: 터미널 > `vibe learn show <id> --json`
+- 다음 카드 보기: PowerShell 또는 Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next`
+- 다음 카드 JSON: PowerShell 또는 Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next --json`
 - 완료 처리: 터미널 > `vibe learn done <id>`
+- 보관 처리: 터미널 > `vibe learn archive <id>`
+- 복습일 설정: 터미널 > `vibe learn schedule <id> --date 2026-07-01`
+- 보관 목록: 터미널 > `vibe learn list --status archived`
 - 참고 링크 추가: 터미널 > `vibe learn add-reference <id> --title "<제목>" --url "<URL>"`
 - Markdown 내보내기: 터미널 > `vibe learn export`
 - 요약 리포트: 터미널 > `vibe learn report`
+- 짧은 집계: 터미널 > `vibe learn stats`
+- JSON 집계: PowerShell 또는 Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn stats --json`
 
 안전 기본값으로 `vibe learn export`는 사용자가 직접 쓴 `LEARNINGS.md`를 덮어쓰지 않고 `LEARNINGS.generated.md`를 생성합니다.
 

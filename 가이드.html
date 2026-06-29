@@ -152,10 +152,22 @@ a:hover{text-decoration:underline}
     <div class="cmd" id="cl2">/vibe learn list<button class="copy" data-t="cl2">복사</button></div>
     <p>자주 쓰는 관리 명령입니다.</p>
     <div class="cmd" id="cl0">vibe learn list --all --domain Docker --type tool_gap --severity 4 --search logs<button class="copy" data-t="cl0">복사</button></div>
+    <div class="cmd" id="cl0l">vibe learn list --limit 5<button class="copy" data-t="cl0l">복사</button></div>
+    <div class="cmd" id="cl0s">vibe learn list --sort severity<button class="copy" data-t="cl0s">복사</button></div>
+    <div class="cmd" id="cl0d">vibe learn list --due<button class="copy" data-t="cl0d">복사</button></div>
+    <div class="cmd" id="cl0j">vibe learn list --all --json<button class="copy" data-t="cl0j">복사</button></div>
     <div class="cmd" id="cl0a">vibe learn add --domain Docker --type tool_gap --title "Docker log triage"<button class="copy" data-t="cl0a">복사</button></div>
     <div class="cmd" id="cl3">vibe learn show &lt;id&gt;<button class="copy" data-t="cl3">복사</button></div>
+    <div class="cmd" id="cl3j">vibe learn show &lt;id&gt; --json<button class="copy" data-t="cl3j">복사</button></div>
+    <div class="cmd" id="cl3n">vibe learn next<button class="copy" data-t="cl3n">복사</button></div>
+    <div class="cmd" id="cl3nj">vibe learn next --json<button class="copy" data-t="cl3nj">복사</button></div>
     <div class="cmd" id="cl4">vibe learn done &lt;id&gt;<button class="copy" data-t="cl4">복사</button></div>
+    <div class="cmd" id="cl4a">vibe learn archive &lt;id&gt;<button class="copy" data-t="cl4a">복사</button></div>
+    <div class="cmd" id="cl4s">vibe learn schedule &lt;id&gt; --date 2026-07-01<button class="copy" data-t="cl4s">복사</button></div>
+    <div class="cmd" id="cl4b">vibe learn list --status archived<button class="copy" data-t="cl4b">복사</button></div>
     <div class="cmd" id="cl5">vibe learn add-reference &lt;id&gt; --title "제목" --url "URL"<button class="copy" data-t="cl5">복사</button></div>
+    <div class="cmd" id="cl6s">vibe learn stats<button class="copy" data-t="cl6s">복사</button></div>
+    <div class="cmd" id="cl6sj">vibe learn stats --json<button class="copy" data-t="cl6sj">복사</button></div>
     <div class="tip">✅ <span class="kbd">vibe learn export</span> 는 사용자가 직접 쓴 <span class="kbd">LEARNINGS.md</span> 를 덮어쓰지 않고
        <span class="kbd">LEARNINGS.generated.md</span> 를 생성합니다.</div>
   </div>
@@ -225,13 +237,25 @@ a:hover{text-decoration:underline}
       <tr><td>vibe learn list</td><td>열린 Domain Learning Card 목록</td></tr>
       <tr><td>vibe learn list --all</td><td>완료된 카드까지 전체 목록</td></tr>
       <tr><td>vibe learn list --all --domain Docker --type tool_gap --severity 4 --search logs</td><td>조건으로 Learning Card 필터</td></tr>
+      <tr><td>vibe learn list --limit 5</td><td>Learning Card 표시 개수 제한</td></tr>
+      <tr><td>vibe learn list --sort severity</td><td>Learning Card 정렬(created/severity/domain)</td></tr>
+      <tr><td>vibe learn list --due</td><td>next_review_at 기준 복습 대상 조회</td></tr>
+      <tr><td>vibe learn list --all --json</td><td>Learning Card 목록을 JSON으로 출력</td></tr>
       <tr><td>vibe learn add --domain Docker --type tool_gap --title "Docker log triage"</td><td>수동 Learning Card 생성</td></tr>
       <tr><td>vibe learn show &lt;id&gt;</td><td>특정 Learning Card 본문 보기</td></tr>
+      <tr><td>vibe learn show &lt;id&gt; --json</td><td>특정 Learning Card를 JSON으로 출력</td></tr>
+      <tr><td>vibe learn next</td><td>다음에 볼 Learning Card 출력</td></tr>
+      <tr><td>vibe learn next --json</td><td>다음에 볼 Learning Card를 JSON으로 출력</td></tr>
       <tr><td>vibe learn done &lt;id&gt;</td><td>Learning Card 완료 처리</td></tr>
+      <tr><td>vibe learn archive &lt;id&gt;</td><td>Learning Card를 삭제하지 않고 archived 상태로 보관</td></tr>
+      <tr><td>vibe learn schedule &lt;id&gt; --date YYYY-MM-DD</td><td>Learning Card 복습 날짜 설정</td></tr>
+      <tr><td>vibe learn list --status archived</td><td>보관된 Learning Card 목록</td></tr>
       <tr><td>vibe learn reopen &lt;id&gt;</td><td>완료한 카드를 다시 open 상태로 변경</td></tr>
       <tr><td>vibe learn add-reference &lt;id&gt; --title "제목" --url "URL"</td><td>카드에 참고 링크 추가</td></tr>
       <tr><td>vibe learn export</td><td>LEARNINGS.generated.md 생성/갱신</td></tr>
       <tr><td>vibe learn report</td><td>도메인별/상태별/중요도별 학습 요약</td></tr>
+      <tr><td>vibe learn stats</td><td>Learning Card 짧은 집계 출력</td></tr>
+      <tr><td>vibe learn stats --json</td><td>Learning Card 짧은 집계를 JSON으로 출력</td></tr>
     </table>
   </div>
 

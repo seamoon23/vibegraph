@@ -77,15 +77,36 @@
   vibe learn list --all  완료된 카드까지 전체 목록
   vibe learn list --all --domain Docker --type tool_gap --severity 4 --search logs
                          조건으로 Learning Card 필터
+  vibe learn list --limit 5
+                         Learning Card 표시 개수 제한
+  vibe learn list --sort severity
+                         Learning Card 정렬(created/severity/domain)
+  vibe learn list --due
+                         next_review_at 기준 복습 대상 조회
+  vibe learn list --all --json
+                         Learning Card 목록을 JSON으로 출력
   vibe learn add --domain Docker --type tool_gap --title "Docker log triage"
                          수동 Learning Card 생성
   vibe learn show <id>   특정 Learning Card 본문 보기
+  vibe learn show <id> --json
+                         특정 Learning Card를 JSON으로 출력
+  vibe learn next        다음에 볼 Learning Card 출력
+  vibe learn next --json 다음에 볼 Learning Card를 JSON으로 출력
   vibe learn done <id>   Learning Card 완료 처리
+  vibe learn archive <id>
+                         Learning Card를 삭제하지 않고 archived 상태로 보관
+  vibe learn schedule <id> --date YYYY-MM-DD
+                         Learning Card 복습 날짜 설정
+  vibe learn list --status archived
+                         archived 상태의 Learning Card 목록
   vibe learn reopen <id> 완료한 카드를 다시 open 상태로 변경
   vibe learn add-reference <id> --title "제목" --url "URL"
                          카드에 참고 링크 추가
   vibe learn export      LEARNINGS.generated.md 생성/갱신
   vibe learn report      도메인별/상태별/중요도별 학습 요약
+  vibe learn stats       Learning Card 짧은 집계 출력
+  vibe learn stats --json
+                         Learning Card 짧은 집계를 JSON으로 출력
 
 
 [ 전체 작업 한눈에 보기 ]
@@ -166,10 +187,22 @@
   자주 쓰는 접근 경로:
     - 터미널 > vibe learn list
     - 터미널 > vibe learn list --all --domain Docker --type tool_gap
+    - 터미널 > vibe learn list --limit 5
+    - 터미널 > vibe learn list --sort severity
+    - 터미널 > vibe learn list --due
+    - 터미널 > vibe learn list --all --json
     - 터미널 > vibe learn add --domain Docker --type tool_gap --title "Docker log triage"
     - 터미널 > vibe learn show <id>
+    - 터미널 > vibe learn show <id> --json
+    - PowerShell 또는 Windows Terminal > cd C:\codex\app\vibegraph > vibe learn next
+    - PowerShell 또는 Windows Terminal > cd C:\codex\app\vibegraph > vibe learn next --json
     - 터미널 > vibe learn done <id>
+    - 터미널 > vibe learn archive <id>
+    - 터미널 > vibe learn schedule <id> --date 2026-07-01
+    - 터미널 > vibe learn list --status archived
     - 터미널 > vibe learn add-reference <id> --title "제목" --url "URL"
+    - 터미널 > vibe learn stats
+    - PowerShell 또는 Windows Terminal > cd C:\codex\app\vibegraph > vibe learn stats --json
     - Claude Code 창 > /vibe learn list
 
   안전 기본값:

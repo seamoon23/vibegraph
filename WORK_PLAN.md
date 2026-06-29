@@ -18,6 +18,16 @@
 6. Update prompt/docs/package metadata.
 7. Run syntax and CLI verification with a temporary `VIBE_HOME`.
 
+## Follow-Up Scope Completed In This Branch
+
+- Learning Card lifecycle: `done`, `reopen`, non-destructive `archive`, and archived list review.
+- Review workflow controls: `--limit`, `--sort`, `--due`, and `schedule --date YYYY-MM-DD`.
+- Review handoff: `vibe learn next` selects due open cards first, then highest-severity open cards.
+- Automation outputs: `vibe learn list --json`, `vibe learn show --json`, `vibe learn next --json`, and `vibe learn stats --json`.
+- Manual backlog support: `vibe learn add` and `vibe learn add-reference`.
+- Compatibility: legacy `learnings.db` migration adds `next_review_at` and keeps old rows listable/schedulable.
+- Release references: `CHANGELOG.md`, `NEXT_STEPS.md`, README, guide, slash-command skill docs, and CLI tests.
+
 ## Blocked Items Policy
 
 If a decision is needed, record it in `NEXT_STEPS.md` and continue with independent work.

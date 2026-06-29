@@ -101,6 +101,9 @@ def init_learnings_db(root: Path) -> Path:
             )
             """
         )
+        columns = {row[1] for row in con.execute("PRAGMA table_info(learning_cards)").fetchall()}
+        if "next_review_at" not in columns:
+            con.execute("ALTER TABLE learning_cards ADD COLUMN next_review_at TEXT")
     return db_path
 
 
@@ -343,7 +346,17 @@ def list_learning_cards(
     signal_type: str | None = None,
     min_severity: int | None = None,
     search: str | None = None,
+    sort_mode: str = "created",
+    due: bool = False,
+    as_of: str | None = None,
 ) -> list[dict[str, Any]]:
+    order_by = {
+        "created": "created_at DESC, severity DESC, id DESC",
+        "severity": "severity DESC, created_at DESC, id DESC",
+        "domain": "lower(domain) ASC, severity DESC, created_at DESC, id DESC",
+    }
+    if sort_mode not in order_by:
+        raise ValueError("sort_mode must be created, severity, or domain")
     init_learnings_db(root)
     query = "SELECT * FROM learning_cards"
     clauses = []
@@ -364,9 +377,16 @@ def list_learning_cards(
         clauses.append("(lower(title) LIKE lower(?) OR lower(evidence) LIKE lower(?) OR lower(micro_summary) LIKE lower(?))")
         needle = f"%{search}%"
         params.extend([needle, needle, needle])
+    if due:
+        due_date = (as_of or datetime.date.today().isoformat())[:10]
+        clauses.append("next_review_at IS NOT NULL AND next_review_at != '' AND substr(next_review_at, 1, 10) <= ?")
+        params.append(due_date)
     if clauses:
         query += " WHERE " + " AND ".join(clauses)
-    query += " ORDER BY created_at DESC, severity DESC, id DESC"
+    if due and sort_mode == "created":
+        query += " ORDER BY substr(next_review_at, 1, 10) ASC, severity DESC, created_at DESC, id DESC"
+    else:
+        query += f" ORDER BY {order_by[sort_mode]}"
     if limit:
         query += " LIMIT ?"
         params.append(limit)
@@ -411,6 +431,14 @@ def get_learning_card(root: Path, card_id: str) -> dict[str, Any] | None:
 def get_last_learning_card(root: Path) -> dict[str, Any] | None:
     cards = list_learning_cards(root, limit=1)
     return cards[0] if cards else None
+
+
+def get_next_learning_card(root: Path, as_of: str | None = None) -> dict[str, Any] | None:
+    due_cards = list_learning_cards(root, status="open", due=True, as_of=as_of, limit=1)
+    if due_cards:
+        return due_cards[0]
+    open_cards = list_learning_cards(root, status="open", sort_mode="severity", limit=1)
+    return open_cards[0] if open_cards else None
 
 
 def create_manual_learning_card(
@@ -460,14 +488,35 @@ def create_manual_learning_card(
 
 
 def update_learning_card_status(root: Path, card_id: str, status: str) -> dict[str, Any]:
-    if status not in {"open", "done"}:
-        raise ValueError("status must be open or done")
+    if status not in {"open", "done", "archived"}:
+        raise ValueError("status must be open, done, or archived")
     init_learnings_db(root)
     now = datetime.datetime.now().isoformat(timespec="seconds")
     with sqlite3.connect(learnings_db_path(root)) as con:
         cur = con.execute(
             "UPDATE learning_cards SET status = ?, updated_at = ? WHERE id = ?",
             (status, now, card_id),
+        )
+        if cur.rowcount == 0:
+            raise KeyError(card_id)
+    card = get_learning_card(root, card_id)
+    if card is None:
+        raise KeyError(card_id)
+    return card
+
+
+def update_learning_card_review_date(root: Path, card_id: str, next_review_at: str) -> dict[str, Any]:
+    next_review_at = next_review_at.strip()
+    try:
+        parsed = datetime.date.fromisoformat(next_review_at)
+    except ValueError:
+        raise ValueError("next_review_at must be YYYY-MM-DD") from None
+    init_learnings_db(root)
+    now = datetime.datetime.now().isoformat(timespec="seconds")
+    with sqlite3.connect(learnings_db_path(root)) as con:
+        cur = con.execute(
+            "UPDATE learning_cards SET next_review_at = ?, updated_at = ? WHERE id = ?",
+            (parsed.isoformat(), now, card_id),
         )
         if cur.rowcount == 0:
             raise KeyError(card_id)
@@ -688,6 +737,7 @@ def learning_summary(root: Path) -> dict[str, Any]:
 
 def _row_to_card(row: sqlite3.Row) -> dict[str, Any]:
     card = dict(row)
+    card["next_review_at"] = card.get("next_review_at") or ""
     try:
         raw = json.loads(card.get("raw_json") or "{}")
     except Exception:

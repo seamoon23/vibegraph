@@ -1,6 +1,6 @@
 ---
 description: VibeGraph 바이브코딩 채점 + Domain Learning Card 관리. start/report/end/list/dashboard/growth/coach/learn 지원.
-argument-hint: start <project> <task> | report | end | list | dashboard | growth | coach | learn <list|add|show|done|reopen|add-reference|export|report>
+argument-hint: start <project> <task> | report | end | list | dashboard | growth | coach | learn <list|add|show|next|done|archive|reopen|add-reference|export|report|stats>
 allowed-tools: [PowerShell, Read, Write]
 ---
 
@@ -28,12 +28,23 @@ $env:PYTHONUTF8 = "1"; vibe $ARGUMENTS
 - Claude Code 창: `/vibe learn list`
 - 터미널: `vibe learn list`
 - 필터 조회: `vibe learn list --all --domain "<도메인>" --type "<타입>" --severity 4 --search "<검색어>"`
+- 제한 조회: `vibe learn list --limit 5`
+- 정렬 조회: `vibe learn list --sort severity`
+- 복습 대상 조회: `vibe learn list --due`
+- JSON 목록 조회: `vibe learn list --all --json`
 - 수동 카드 생성: `vibe learn add --domain "<도메인>" --type "<타입>" --title "<제목>"`
 - 카드 보기: `vibe learn show <id>`
+- JSON 카드 보기: `vibe learn show <id> --json`
+- 다음 카드 보기: `vibe learn next`
+- 다음 카드 JSON: `vibe learn next --json`
 - 완료 처리: `vibe learn done <id>`
+- 보관 처리: `vibe learn archive <id>`
+- 복습일 설정: `vibe learn schedule <id> --date 2026-07-01`
 - 다시 열기: `vibe learn reopen <id>`
 - 참고 링크 추가: `vibe learn add-reference <id> --title "<제목>" --url "<URL>"`
 - Markdown 생성: `vibe learn export`
+- 짧은 집계: `vibe learn stats`
+- JSON 집계: `vibe learn stats --json`
 
 ### report — 현재 대화 자동 채점 + 리포트 생성
 

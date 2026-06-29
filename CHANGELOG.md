@@ -36,11 +36,37 @@ Branch: `feature/domain-learning-layer-mvp`
 
 ### In Progress After `e0fe60f`
 
+- Committed manual Learning Card creation, list filters, and Dashboard 2nd-pass sections in `5ee6b8b feat: add learning filters and dashboard sections`.
 - Added manual Learning Card creation.
   - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn add --domain Docker --type tool_gap --title "Docker log triage"`
 - Added filtered Learning Card listing.
   - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn list --all --domain Docker --type tool_gap --severity 4 --search logs`
+- Added limited Learning Card listing.
+  - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn list --limit 5`
+- Added sorted Learning Card listing.
+  - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn list --sort severity`
+- Added due-review Learning Card listing.
+  - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn list --due`
+- Added Learning Card review-date scheduling.
+  - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn schedule <id> --date 2026-07-01`
+- Added JSON Learning Card list output.
+  - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn list --all --json`
+- Added a legacy `learnings.db` guard that adds `next_review_at` when older databases do not have the column.
+- `vibe learn list --due` now prints `next_review_at=YYYY-MM-DD` with each due card.
 - Added Dashboard 2nd-pass anchor sections for Summary, AI Review, Domain Learning, Sessions, and Settings.
+- Added non-destructive Learning Card archiving.
+  - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn archive <id>`
+  - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn list --status archived`
+- Added JSON Learning Card output for automation.
+  - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn show <id> --json`
+- Added quick Learning Card stats.
+  - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn stats`
+  - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn stats --json`
+- Added next-card selection for review handoff.
+  - Due open cards are selected first, then highest-severity open cards.
+  - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next`
+  - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next --json`
+- Hardened legacy `learnings.db` migration so old rows expose blank `next_review_at` values and can still be listed, shown, and scheduled.
 
 ### Safety Notes
 
@@ -52,4 +78,6 @@ Branch: `feature/domain-learning-layer-mvp`
 
 - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `python -m unittest discover -s tests -v`
 - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `python -m py_compile vibe.py vibe_learning.py`
+- Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `python -m pip install -e .`
+- Access path: PowerShell or Windows Terminal > `where.exe vibe` > `vibe --help`
 - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `git status --short --branch`

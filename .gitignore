@@ -5,6 +5,7 @@ __pycache__/
 *.egg-info/
 .venv/
 venv/
+.verify-*/
 
 # ── VibeGraph 로컬/생성 파일 ──
 # 채점 데이터는 기본적으로 ~/.vibegraph 에 저장되므로 저장소에 포함되지 않습니다.

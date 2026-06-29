@@ -224,7 +224,7 @@ Java 레거시(1.6~1.8) + Spring + MyBatis + Oracle/MariaDB/Cubrid + Tomcat/JEUS
 SKILL_CONTENT = """\
 ---
 description: VibeGraph 바이브코딩 채점 + Domain Learning Card 관리. start/report/end/list/dashboard/growth/coach/learn 지원.
-argument-hint: start <project> <task> | report | end | list | dashboard | growth | coach | learn <list|add|show|done|reopen|add-reference|export|report>
+argument-hint: start <project> <task> | report | end | list | dashboard | growth | coach | learn <list|add|show|next|done|archive|reopen|add-reference|export|report|stats>
 allowed-tools: [PowerShell, Read, Write]
 ---
 
@@ -252,12 +252,23 @@ $env:PYTHONUTF8 = "1"; vibe $ARGUMENTS
 - Claude Code 창: `/vibe learn list`
 - 터미널: `vibe learn list`
 - 필터 조회: `vibe learn list --all --domain "<도메인>" --type "<타입>" --severity 4 --search "<검색어>"`
+- 제한 조회: `vibe learn list --limit 5`
+- 정렬 조회: `vibe learn list --sort severity`
+- 복습 대상 조회: `vibe learn list --due`
+- JSON 목록 조회: `vibe learn list --all --json`
 - 수동 카드 생성: `vibe learn add --domain "<도메인>" --type "<타입>" --title "<제목>"`
 - 카드 보기: `vibe learn show <id>`
+- JSON 카드 보기: `vibe learn show <id> --json`
+- 다음 카드 보기: `vibe learn next`
+- 다음 카드 JSON: `vibe learn next --json`
 - 완료 처리: `vibe learn done <id>`
+- 보관 처리: `vibe learn archive <id>`
+- 복습일 설정: `vibe learn schedule <id> --date 2026-07-01`
 - 다시 열기: `vibe learn reopen <id>`
 - 참고 링크 추가: `vibe learn add-reference <id> --title "<제목>" --url "<URL>"`
 - Markdown 생성: `vibe learn export`
+- 짧은 집계: `vibe learn stats`
+- JSON 집계: `vibe learn stats --json`
 
 ### report — 현재 대화 자동 채점 + 리포트 생성
 
@@ -820,10 +831,13 @@ def generate_index_html(items: list, learning=None) -> str:
         domain_chips = '<span class="muted">아직 도메인 학습 데이터가 없습니다.</span>'
     review_rows = ""
     for card in learning.get("review_candidates", [])[:5]:
+        show_cmd = f"vibe learn show {card.get('id', '')}"
+        archive_cmd = f"vibe learn archive {card.get('id', '')}"
         review_rows += f"""
       <div class="learn-item">
         <div><b>{_esc(card.get('title', ''))}</b><span>{_esc(card.get('domain', 'Etc'))} · {_esc(card.get('type', 'domain_gap'))} · severity {card.get('severity', 0)}</span></div>
-        <code>{_esc(card.get('id', ''))}</code>
+        <code>{_esc(show_cmd)}</code>
+        <code>{_esc(archive_cmd)}</code>
       </div>"""
     if not review_rows:
         review_rows = '<div class="learn-empty">vibe report 또는 vibe end 후 domain_learning 신호가 생기면 여기에 복습 후보가 표시됩니다.</div>'
@@ -836,6 +850,7 @@ def generate_index_html(items: list, learning=None) -> str:
       </div>
       <div class="learn-actions">
         <code>vibe learn list</code>
+        <code>vibe learn list --status archived</code>
         <code>vibe learn export</code>
       </div>
     </div>
@@ -1144,10 +1159,16 @@ def cmd_learn(args):
         cmd_learn_card(args)
     elif action == "show":
         cmd_learn_card(args)
+    elif action == "next":
+        cmd_learn_next(args)
     elif action == "done":
         cmd_learn_status(args, "done")
     elif action == "reopen":
         cmd_learn_status(args, "open")
+    elif action == "archive":
+        cmd_learn_status(args, "archived")
+    elif action == "schedule":
+        cmd_learn_schedule(args)
     elif action == "add-reference":
         cmd_learn_add_reference(args)
     elif action == "add":
@@ -1156,8 +1177,10 @@ def cmd_learn(args):
         cmd_learn_export(args)
     elif action == "report":
         cmd_learn_report(args)
+    elif action == "stats":
+        cmd_learn_stats(args)
     else:
-        print("사용법: vibe learn <list|card|export|report>")
+        print("사용법: vibe learn <list|card|show|next|done|archive|reopen|add|export|report|stats>")
         print("접근 경로: 터미널 > vibe learn list")
 
 
@@ -1170,7 +1193,17 @@ def cmd_learn_list(args):
         signal_type=getattr(args, "type", None),
         min_severity=getattr(args, "severity", None),
         search=getattr(args, "search", None),
+        limit=getattr(args, "limit", None),
+        sort_mode=getattr(args, "sort", "created"),
+        due=getattr(args, "due", False),
     )
+    if getattr(args, "json", False):
+        print(json.dumps(cards, ensure_ascii=False, indent=2))
+        return
+    if getattr(args, "due", False):
+        for card in cards:
+            review_date = (card.get("next_review_at") or "")[:10]
+            card["title"] = f"{card['title']} (next_review_at={review_date})"
     if not cards:
         print("\n아직 Learning Card가 없습니다.")
         print("접근 경로: 터미널 > vibe report 또는 vibe end 실행 후 vibe learn list\n")
@@ -1198,8 +1231,31 @@ def cmd_learn_card(args):
         print("접근 경로: 터미널 > vibe learn list\n")
         return
     refs = vibe_learning.list_learning_references(ROOT, card["id"])
+    if getattr(args, "json", False):
+        payload = dict(card)
+        payload["references"] = refs
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        return
     print()
     print(vibe_learning.render_learning_card_md(card, refs))
+    print()
+
+
+def cmd_learn_next(args):
+    card = vibe_learning.get_next_learning_card(ROOT)
+    if not card:
+        print("\nLearning Card가 없습니다.")
+        print("접근 경로: 터미널 > vibe learn list\n")
+        return
+    refs = vibe_learning.list_learning_references(ROOT, card["id"])
+    if getattr(args, "json", False):
+        payload = dict(card)
+        payload["references"] = refs
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        return
+    print()
+    print(vibe_learning.render_learning_card_md(card, refs))
+    print("접근 경로: 터미널 > vibe learn next")
     print()
 
 
@@ -1212,6 +1268,21 @@ def cmd_learn_status(args, status):
         sys.exit(1)
     print(f"\n🧠  {card['id']} 상태를 {card['status']}로 변경했습니다.")
     print("접근 경로: 터미널 > vibe learn list --all\n")
+
+
+def cmd_learn_schedule(args):
+    try:
+        card = vibe_learning.update_learning_card_review_date(ROOT, args.id, args.date)
+    except KeyError:
+        print(f"\nLearning Card를 찾을 수 없습니다: {args.id}")
+        print("접근 경로: 터미널 > vibe learn list --all\n")
+        sys.exit(1)
+    except ValueError as e:
+        print(f"\n복습 날짜를 변경할 수 없습니다: {e}")
+        print("접근 경로: 터미널 > vibe learn schedule <id> --date YYYY-MM-DD\n")
+        sys.exit(1)
+    print(f"\n🧠  {card['id']} next_review_at={card['next_review_at']}")
+    print("접근 경로: 터미널 > vibe learn list --due\n")
 
 
 def cmd_learn_add_reference(args):
@@ -1270,6 +1341,41 @@ def cmd_learn_report(args):
     print()
     print(vibe_learning.render_learning_report(ROOT))
     print()
+
+
+def cmd_learn_stats(args):
+    cards = vibe_learning.list_learning_cards(ROOT, status=None)
+    counts = {"open": 0, "done": 0, "archived": 0}
+    domains: dict[str, int] = {}
+    high_open = 0
+    for card in cards:
+        status = card.get("status") or "open"
+        counts[status] = counts.get(status, 0) + 1
+        domain = card.get("domain") or "Etc"
+        domains[domain] = domains.get(domain, 0) + 1
+        if status == "open" and int(card.get("severity") or 0) >= 4:
+            high_open += 1
+    payload = {
+        "total": len(cards),
+        "open": counts.get("open", 0),
+        "done": counts.get("done", 0),
+        "archived": counts.get("archived", 0),
+        "high_open": high_open,
+        "domains": dict(sorted(domains.items())),
+    }
+    if getattr(args, "json", False):
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        return
+    print("\nLearning Stats")
+    print(f"- total: {payload['total']}")
+    print(f"- open: {payload['open']}")
+    print(f"- done: {payload['done']}")
+    print(f"- archived: {payload['archived']}")
+    print(f"- high_open: {payload['high_open']}")
+    if domains:
+        top_domains = ", ".join(f"{domain}={count}" for domain, count in list(payload["domains"].items())[:5])
+        print(f"- domains: {top_domains}")
+    print("접근 경로: 터미널 > vibe learn stats\n")
 
 
 # ── 성장 분석 신호 추출 (A·B 공용) ───────────────────────────────────────────────
@@ -2026,25 +2132,41 @@ def main():
     learn_sub = plearn.add_subparsers(dest="learn_cmd")
 
     pll = learn_sub.add_parser("list", help="열린 Learning Card 목록")
-    pll.add_argument("--status", default="open", help="조회할 상태 (기본: open)")
+    pll.add_argument("--status", default="open", choices=["open", "done", "archived"], help="조회할 상태 (기본: open)")
     pll.add_argument("--all", action="store_true", help="모든 상태 조회")
     pll.add_argument("--domain", help="특정 도메인만 조회")
     pll.add_argument("--type", help="특정 Learning Signal 타입만 조회")
     pll.add_argument("--severity", type=int, help="최소 severity")
     pll.add_argument("--search", help="제목/근거/요약 검색어")
+    pll.add_argument("--limit", type=int, help="최대 표시 개수")
+    pll.add_argument("--sort", choices=["created", "severity", "domain"], default="created", help="정렬 기준 (기본: created)")
+    pll.add_argument("--due", action="store_true", help="next_review_at이 오늘 이전인 복습 대상만 조회")
+    pll.add_argument("--json", action="store_true", help="JSON 형식으로 출력")
 
     plc = learn_sub.add_parser("card", help="Learning Card 본문 출력")
     plc.add_argument("id", nargs="?", help="카드 ID")
     plc.add_argument("--last", action="store_true", help="가장 최근 카드 출력")
+    plc.add_argument("--json", action="store_true", help="JSON 형식으로 출력")
 
     pls = learn_sub.add_parser("show", help="Learning Card 본문 출력")
     pls.add_argument("id", help="카드 ID")
+    pls.add_argument("--json", action="store_true", help="JSON 형식으로 출력")
+
+    plnext = learn_sub.add_parser("next", help="다음에 볼 Learning Card 출력")
+    plnext.add_argument("--json", action="store_true", help="JSON 형식으로 출력")
 
     pld = learn_sub.add_parser("done", help="Learning Card를 완료 처리")
     pld.add_argument("id", help="카드 ID")
 
     plr = learn_sub.add_parser("reopen", help="Learning Card를 open 상태로 되돌리기")
     plr.add_argument("id", help="카드 ID")
+
+    pla_status = learn_sub.add_parser("archive", help="Learning Card를 archived 상태로 보관")
+    pla_status.add_argument("id", help="카드 ID")
+
+    plsched = learn_sub.add_parser("schedule", help="Learning Card 복습 날짜 설정")
+    plsched.add_argument("id", help="카드 ID")
+    plsched.add_argument("--date", required=True, help="복습 날짜 YYYY-MM-DD")
 
     plref = learn_sub.add_parser("add-reference", help="Learning Card에 참고 링크 추가")
     plref.add_argument("id", help="카드 ID")
@@ -2066,6 +2188,8 @@ def main():
 
     learn_sub.add_parser("export", help="LEARNINGS.generated.md 생성/갱신")
     learn_sub.add_parser("report", help="학습 요약 리포트 출력")
+    plstats = learn_sub.add_parser("stats", help="Learning Card 짧은 집계 출력")
+    plstats.add_argument("--json", action="store_true", help="JSON 형식으로 출력")
 
     pis = sub.add_parser(
         "install-skill",
