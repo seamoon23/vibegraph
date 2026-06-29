@@ -3,11 +3,12 @@
 ## Current Branch
 
 - Branch: `feature/domain-learning-layer-mvp`
-- Latest local commit: `aa82b52 fix: validate learning cli inputs`
 - Scope: Domain Learning Card MVP follow-up workflows, review handoff, deterministic review-date checks, CLI validation, and release docs.
+- Latest commit access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `git log --oneline -n 1`
 
-## Recent Commits
+## Recent Baseline Commits
 
+- `503173f docs: add domain learning release handoff`
 - `aa82b52 fix: validate learning cli inputs`
 - `52c9270 fix: validate learning review dates`
 - `d0ca8e6 feat: add deterministic learning review dates`
