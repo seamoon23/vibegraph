@@ -1864,6 +1864,16 @@ def _positive_int_arg(value: str) -> int:
     return parsed
 
 
+def _severity_arg(value: str) -> int:
+    try:
+        parsed = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError("severity must be 1-5") from None
+    if parsed < 1 or parsed > 5:
+        raise argparse.ArgumentTypeError("severity must be 1-5")
+    return parsed
+
+
 def generate_report_html(data: dict) -> str:
     scores = data["scores"]
     grade = data["grade"]
@@ -2157,7 +2167,7 @@ def main():
     pll.add_argument("--all", action="store_true", help="모든 상태 조회")
     pll.add_argument("--domain", help="특정 도메인만 조회")
     pll.add_argument("--type", help="특정 Learning Signal 타입만 조회")
-    pll.add_argument("--severity", type=int, help="최소 severity")
+    pll.add_argument("--severity", type=_severity_arg, help="최소 severity")
     pll.add_argument("--search", help="제목/근거/요약 검색어")
     pll.add_argument("--limit", type=_positive_int_arg, help="최대 표시 개수")
     pll.add_argument("--sort", choices=["created", "severity", "domain"], default="created", help="정렬 기준 (기본: created)")
@@ -2203,7 +2213,7 @@ def main():
     pla.add_argument("--type", required=True, help="Learning Signal 타입")
     pla.add_argument("--title", required=True, help="카드 제목")
     pla.add_argument("--evidence", default="", help="근거 또는 메모")
-    pla.add_argument("--severity", type=int, default=3, help="중요도 1-5")
+    pla.add_argument("--severity", type=_severity_arg, default=3, help="중요도 1-5")
     pla.add_argument("--confidence", default="medium", help="low|medium|high")
     pla.add_argument("--summary", default="", help="핵심 개념 1줄 요약")
     pla.add_argument("--goal", default="", help="5분 복습 목표")

@@ -137,6 +137,10 @@ class VibeCliLearningTests(unittest.TestCase):
         self.assertNotEqual(invalid_status.returncode, 0)
         self.assertIn("invalid choice", invalid_status.stderr)
 
+        invalid_filter_severity = self.run_vibe("learn", "list", "--severity", "0")
+        self.assertNotEqual(invalid_filter_severity.returncode, 0)
+        self.assertIn("1-5", invalid_filter_severity.stderr)
+
         reopened = self.run_vibe("learn", "reopen", "LC-20260628-docker-logs")
         self.assertEqual(reopened.returncode, 0, reopened.stdout + reopened.stderr)
         self.assertIn("open", reopened.stdout)
@@ -235,6 +239,21 @@ class VibeCliLearningTests(unittest.TestCase):
         )
         self.assertEqual(manual.returncode, 0, manual.stdout + manual.stderr)
         self.assertIn("Oracle grants checklist", manual.stdout)
+
+        invalid_add_severity = self.run_vibe(
+            "learn",
+            "add",
+            "--domain",
+            "Oracle",
+            "--type",
+            "concept_gap",
+            "--title",
+            "Bad severity",
+            "--severity",
+            "6",
+        )
+        self.assertNotEqual(invalid_add_severity.returncode, 0)
+        self.assertIn("1-5", invalid_add_severity.stderr)
 
         next_as_of = self.run_vibe("learn", "next", "--as-of", "2026-06-30", "--json")
         self.assertEqual(next_as_of.returncode, 0, next_as_of.stdout + next_as_of.stderr)

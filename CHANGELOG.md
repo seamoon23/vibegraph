@@ -71,6 +71,7 @@ Branch: `feature/domain-learning-layer-mvp`
   - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next --as-of 2026-07-01 --json`
   - Invalid `--as-of` values now fail fast unless they use `YYYY-MM-DD`.
 - Invalid `vibe learn list --limit` values now fail fast unless they are positive integers.
+- Invalid `vibe learn list --severity` and `vibe learn add --severity` values now fail fast unless they are in `1-5`.
 - Aligned dashboard and growth review candidates with the same due-first priority as `vibe learn next`.
 - Hardened legacy `learnings.db` migration so old rows expose blank `next_review_at` values and can still be listed, shown, and scheduled.
 
