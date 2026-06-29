@@ -1847,6 +1847,13 @@ def _esc(s: str) -> str:
             .replace('"', "&quot;"))
 
 
+def _date_arg(value: str) -> str:
+    try:
+        return datetime.date.fromisoformat(value).isoformat()
+    except ValueError:
+        raise argparse.ArgumentTypeError("date must be YYYY-MM-DD") from None
+
+
 def generate_report_html(data: dict) -> str:
     scores = data["scores"]
     grade = data["grade"]
@@ -2145,7 +2152,7 @@ def main():
     pll.add_argument("--limit", type=int, help="최대 표시 개수")
     pll.add_argument("--sort", choices=["created", "severity", "domain"], default="created", help="정렬 기준 (기본: created)")
     pll.add_argument("--due", action="store_true", help="next_review_at이 오늘 이전인 복습 대상만 조회")
-    pll.add_argument("--as-of", help="복습 기준일 YYYY-MM-DD (기본: 오늘)")
+    pll.add_argument("--as-of", type=_date_arg, help="복습 기준일 YYYY-MM-DD (기본: 오늘)")
     pll.add_argument("--json", action="store_true", help="JSON 형식으로 출력")
 
     plc = learn_sub.add_parser("card", help="Learning Card 본문 출력")
@@ -2158,7 +2165,7 @@ def main():
     pls.add_argument("--json", action="store_true", help="JSON 형식으로 출력")
 
     plnext = learn_sub.add_parser("next", help="다음에 볼 Learning Card 출력")
-    plnext.add_argument("--as-of", help="복습 기준일 YYYY-MM-DD (기본: 오늘)")
+    plnext.add_argument("--as-of", type=_date_arg, help="복습 기준일 YYYY-MM-DD (기본: 오늘)")
     plnext.add_argument("--json", action="store_true", help="JSON 형식으로 출력")
 
     pld = learn_sub.add_parser("done", help="Learning Card를 완료 처리")
