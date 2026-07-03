@@ -108,7 +108,7 @@ Safe lock recovery access path:
 
 Editable install verification can be blocked in the Codex sandbox if Python or pip selects a Windows temp folder that denies wheel/build-tracker writes, for example `C:\Users\seamo\AppData\Local\Temp`. In that case, record the failed command output, verify the CLI directly with a temporary `VIBE_HOME`, and rerun install verification outside the sandbox before publishing.
 
-`install.bat` still needs a release-pass text update to advertise `vibe learn list` after install. This session did not edit it because the file is not currently UTF-8 readable by the patch tool; update it only after choosing and preserving the intended batch-file encoding.
+`install.bat` now advertises `vibe learn list` in the post-install success path while preserving its existing batch-file encoding.
 
 Install-verification fallback smoke access path:
 

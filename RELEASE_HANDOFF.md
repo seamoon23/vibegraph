@@ -30,10 +30,10 @@
 - Learning stats JSON: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn stats --json`
 - Archived list: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn list --status archived`
 
-## Known Blocker
+## Install Note
 
-- `install.bat` still needs a release-pass success-screen text update to mention `vibe learn list`.
-- This file is not currently UTF-8 readable by the patch tool, so preserve its intended batch-file encoding before editing.
+- `install.bat` now mentions `vibe learn list` in the success-screen command list and success marker file.
+- The file uses a legacy Korean batch-file encoding, so keep future edits encoding-safe.
 
 ## Git Lock Note
 

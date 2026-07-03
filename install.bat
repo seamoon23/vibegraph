@@ -37,6 +37,7 @@ set "OKFILE=%VIBE_DIR%\_설치완료_OK.txt"
 > "%OKFILE%" echo VibeGraph 설치가 정상 완료되었습니다.
 >> "%OKFILE%" echo 설치 위치: %VIBE_DIR%
 >> "%OKFILE%" echo 사용법: 새 터미널에서  vibe start 프로젝트명 작업명
+>> "%OKFILE%" echo Domain Learning: vibe learn list
 >> "%OKFILE%" echo (이 파일은 설치 성공 표시용입니다. 지워도 됩니다.)
 
 echo.
@@ -55,6 +56,7 @@ echo      vibe start  프로젝트명  작업명
 echo      vibe prompt
 echo      vibe end
 echo      vibe stats
+echo      vibe learn list
 echo.
 echo  잠시 후 사용 가이드(가이드.html)가 열립니다.
 echo ============================================================
