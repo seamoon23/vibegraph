@@ -33,6 +33,7 @@ The next local changes after `e0fe60f` add:
 - JSON backlog stats through `vibe learn stats --json`.
 - Next-card review handoff through `vibe learn next` and `vibe learn next --json`.
 - Deterministic next-card checks through `vibe learn next --as-of YYYY-MM-DD --json`.
+- Lightweight self-check review through `vibe learn quiz --limit 3` and `vibe learn quiz --limit 3 --json`; this is intentionally not scored or persisted.
 - Dashboard and growth review candidates now follow the same due-first priority as `vibe learn next`.
 - Release notes in `CHANGELOG.md`.
 
@@ -51,7 +52,7 @@ The next local changes after `e0fe60f` add:
 
 3. Optional CLI smoke path for a fresh local data home.
    - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph`
-   - Set a temporary `VIBE_HOME`, run a small `vibe report` / `vibe end` fixture, then verify `vibe learn list`, `vibe learn list --limit 5`, `vibe learn list --sort severity`, `vibe learn list --due`, `vibe learn list --due --as-of 2026-07-01`, `vibe learn list --all --json`, `vibe learn show <id>`, `vibe learn show <id> --json`, `vibe learn next`, `vibe learn next --json`, `vibe learn next --as-of 2026-07-01 --json`, `vibe learn schedule <id> --date 2026-07-01`, `vibe learn done <id>`, `vibe learn archive <id>`, `vibe learn list --status archived`, `vibe learn reopen <id>`, `vibe learn add-reference <id> --title "<title>" --url "<url>"`, `vibe learn stats`, `vibe learn stats --json`, and `vibe learn export`.
+   - Set a temporary `VIBE_HOME`, run a small `vibe report` / `vibe end` fixture, then verify `vibe learn list`, `vibe learn list --limit 5`, `vibe learn list --sort severity`, `vibe learn list --due`, `vibe learn list --due --as-of 2026-07-01`, `vibe learn list --all --json`, `vibe learn show <id>`, `vibe learn show <id> --json`, `vibe learn next`, `vibe learn next --json`, `vibe learn next --as-of 2026-07-01 --json`, `vibe learn quiz --limit 3`, `vibe learn quiz --limit 3 --json`, `vibe learn schedule <id> --date 2026-07-01`, `vibe learn done <id>`, `vibe learn archive <id>`, `vibe learn list --status archived`, `vibe learn reopen <id>`, `vibe learn add-reference <id> --title "<title>" --url "<url>"`, `vibe learn stats`, `vibe learn stats --json`, and `vibe learn export`.
 
 4. Prepare branch publication if requested.
    - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `git log --oneline --decorate -n 5`
@@ -77,6 +78,8 @@ The next local changes after `e0fe60f` add:
 - Next review card: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next`
 - Next review card JSON: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next --json`
 - Next review card as of date JSON: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next --as-of 2026-07-01 --json`
+- Self-check quiz: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn quiz --limit 3`
+- Self-check quiz JSON: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn quiz --limit 3 --json`
 - Mark done: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn done <id>`
 - Archive: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn archive <id>`
 - Archived list: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn list --status archived`

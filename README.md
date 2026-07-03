@@ -165,6 +165,8 @@ vibe end                         # 리포트(report.html) 생성 + 조회/성장
 | `vibe learn next` | 다음에 볼 Learning Card 출력 |
 | `vibe learn next --json` | 다음에 볼 Learning Card를 JSON으로 출력 |
 | `vibe learn next --as-of YYYY-MM-DD --json` | 지정한 기준일로 다음 Learning Card를 JSON 출력 |
+| `vibe learn quiz --limit 3` | 복습 후보 3개를 목표/요약/셀프체크 질문으로 출력 |
+| `vibe learn quiz --limit 3 --json` | 셀프체크 퀴즈 후보를 JSON으로 출력 |
 | `vibe learn card --last` | 가장 최근 Learning Card 본문 출력 |
 | `vibe learn done <id>` | Learning Card 완료 처리 |
 | `vibe learn archive <id>` | Learning Card를 삭제하지 않고 archived 상태로 보관 |
@@ -198,6 +200,8 @@ vibe end                         # 리포트(report.html) 생성 + 조회/성장
 - 다음 카드 보기: PowerShell 또는 Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next`
 - 다음 카드 JSON: PowerShell 또는 Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next --json`
 - 기준일 다음 카드 JSON: PowerShell 또는 Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next --as-of 2026-07-01 --json`
+- 셀프체크 퀴즈: PowerShell 또는 Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn quiz --limit 3`
+- 셀프체크 퀴즈 JSON: PowerShell 또는 Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn quiz --limit 3 --json`
 - 완료 처리: 터미널 > `vibe learn done <id>`
 - 보관 처리: 터미널 > `vibe learn archive <id>`
 - 복습일 설정: 터미널 > `vibe learn schedule <id> --date 2026-07-01`

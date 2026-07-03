@@ -98,6 +98,7 @@ CLI는 폴더 정리·HTML 생성·통계만 담당하고, **외부 API를 일�
    vibe growth        # 성장 추세 보기
    vibe learn list    # Domain Learning Card 확인
    vibe learn next    # 오늘 볼 다음 Learning Card 확인
+   vibe learn quiz --limit 3  # 점수/기록 없는 셀프체크 질문 확인
    vibe learn next --as-of 2026-07-01 --json  # 자동화용 기준일 고정
    vibe learn stats --json  # 자동화용 Learning Card 집계
    ```

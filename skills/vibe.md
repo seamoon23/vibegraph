@@ -1,6 +1,6 @@
 ---
 description: VibeGraph 바이브코딩 채점 + Domain Learning Card 관리. start/report/end/list/dashboard/growth/coach/learn 지원.
-argument-hint: start <project> <task> | report | end | list | dashboard | growth | coach | learn <list|add|show|next|done|archive|reopen|add-reference|export|report|stats>
+argument-hint: start <project> <task> | report | end | list | dashboard | growth | coach | learn <list|add|show|next|quiz|done|archive|reopen|add-reference|export|report|stats>
 allowed-tools: [PowerShell, Read, Write]
 ---
 
@@ -39,6 +39,8 @@ $env:PYTHONUTF8 = "1"; vibe $ARGUMENTS
 - 다음 카드 보기: `vibe learn next`
 - 다음 카드 JSON: `vibe learn next --json`
 - 기준일 다음 카드 JSON: `vibe learn next --as-of 2026-07-01 --json`
+- 셀프체크 퀴즈: `vibe learn quiz --limit 3`
+- 셀프체크 퀴즈 JSON: `vibe learn quiz --limit 3 --json`
 - 완료 처리: `vibe learn done <id>`
 - 보관 처리: `vibe learn archive <id>`
 - 복습일 설정: `vibe learn schedule <id> --date 2026-07-01`

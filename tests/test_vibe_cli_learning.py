@@ -54,6 +54,7 @@ class VibeCliLearningTests(unittest.TestCase):
                                 "confidence": "high",
                                 "micro_summary": "Start with container status, recent logs, and restart count.",
                                 "micro_goal": "Explain a three-command Docker log triage path.",
+                                "self_checkpoints": ["Which Docker command shows recent logs first?"],
                                 "next_review_at": "2026-06-28",
                             }
                         ],
@@ -176,6 +177,19 @@ class VibeCliLearningTests(unittest.TestCase):
         next_payload = json.loads(next_json.stdout)
         self.assertEqual(next_payload["id"], "LC-20260628-docker-logs")
         self.assertEqual(next_payload["next_review_at"], "2026-06-28")
+
+        quiz = self.run_vibe("learn", "quiz", "--limit", "1")
+        self.assertEqual(quiz.returncode, 0, quiz.stdout + quiz.stderr)
+        self.assertIn("Learning Quiz", quiz.stdout)
+        self.assertIn("Which Docker command shows recent logs first?", quiz.stdout)
+        self.assertIn("Explain a three-command Docker log triage path.", quiz.stdout)
+        self.assertIn("vibe learn show LC-20260628-docker-logs", quiz.stdout)
+
+        quiz_json = self.run_vibe("learn", "quiz", "--limit", "1", "--json")
+        self.assertEqual(quiz_json.returncode, 0, quiz_json.stdout + quiz_json.stderr)
+        quiz_payload = json.loads(quiz_json.stdout)
+        self.assertEqual(quiz_payload[0]["id"], "LC-20260628-docker-logs")
+        self.assertEqual(quiz_payload[0]["questions"], ["Which Docker command shows recent logs first?"])
 
         scheduled = self.run_vibe("learn", "schedule", "LC-20260628-docker-logs", "--date", "2026-07-01")
         self.assertEqual(scheduled.returncode, 0, scheduled.stdout + scheduled.stderr)

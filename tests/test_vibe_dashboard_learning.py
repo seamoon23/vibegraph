@@ -40,6 +40,9 @@ class DashboardLearningTests(unittest.TestCase):
                         "title": "Docker container log triage",
                         "severity": 4,
                         "status": "open",
+                        "micro_summary": "Start with status, logs, and restart count.",
+                        "micro_goal": "Explain the Docker log triage path.",
+                        "self_checkpoints": ["Which Docker command shows recent logs first?"],
                     }
                 ],
             },
@@ -53,6 +56,9 @@ class DashboardLearningTests(unittest.TestCase):
         self.assertIn("vibe learn archive LC-20260628-docker-logs", html)
         self.assertIn("vibe learn list --status archived", html)
         self.assertIn("Docker container log triage", html)
+        self.assertIn("Start with status, logs, and restart count.", html)
+        self.assertIn("Which Docker command shows recent logs first?", html)
+        self.assertIn("vibe learn quiz", html)
         self.assertIn('id="summary"', html)
         self.assertIn('id="ai-review"', html)
         self.assertIn('id="domain-learning"', html)

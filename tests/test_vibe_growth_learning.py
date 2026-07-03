@@ -37,6 +37,9 @@ class GrowthLearningTests(unittest.TestCase):
                         "domain": "Docker",
                         "title": "Docker container log triage",
                         "severity": 4,
+                        "micro_summary": "Start with status, logs, and restart count.",
+                        "micro_goal": "Explain the Docker log triage path.",
+                        "self_checkpoints": ["Which Docker command shows recent logs first?"],
                     }
                 ],
             },
@@ -45,7 +48,10 @@ class GrowthLearningTests(unittest.TestCase):
         self.assertIn("Domain Learning", html)
         self.assertIn("열린 Learning Card", html)
         self.assertIn("vibe learn next", html)
+        self.assertIn("vibe learn quiz", html)
         self.assertIn("Docker container log triage", html)
+        self.assertIn("Start with status, logs, and restart count.", html)
+        self.assertIn("Which Docker command shows recent logs first?", html)
 
 
 if __name__ == "__main__":

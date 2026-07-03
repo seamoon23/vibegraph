@@ -96,6 +96,10 @@
   vibe learn next --json 다음에 볼 Learning Card를 JSON으로 출력
   vibe learn next --as-of YYYY-MM-DD --json
                          지정한 기준일로 다음 Learning Card를 JSON으로 출력
+  vibe learn quiz --limit 3
+                         복습 후보 3개를 목표/요약/셀프체크 질문으로 출력
+  vibe learn quiz --limit 3 --json
+                         셀프체크 퀴즈 후보를 JSON으로 출력
   vibe learn done <id>   Learning Card 완료 처리
   vibe learn archive <id>
                          Learning Card를 삭제하지 않고 archived 상태로 보관
@@ -202,6 +206,8 @@
     - PowerShell 또는 Windows Terminal > cd C:\codex\app\vibegraph > vibe learn next
     - PowerShell 또는 Windows Terminal > cd C:\codex\app\vibegraph > vibe learn next --json
     - PowerShell 또는 Windows Terminal > cd C:\codex\app\vibegraph > vibe learn next --as-of 2026-07-01 --json
+    - PowerShell 또는 Windows Terminal > cd C:\codex\app\vibegraph > vibe learn quiz --limit 3
+    - PowerShell 또는 Windows Terminal > cd C:\codex\app\vibegraph > vibe learn quiz --limit 3 --json
     - 터미널 > vibe learn done <id>
     - 터미널 > vibe learn archive <id>
     - 터미널 > vibe learn schedule <id> --date 2026-07-01

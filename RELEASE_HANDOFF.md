@@ -26,6 +26,7 @@
 
 - List due cards as of a fixed date: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn list --due --as-of 2026-07-01`
 - Next review card JSON as of a fixed date: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next --as-of 2026-07-01 --json`
+- Self-check quiz JSON: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn quiz --limit 3 --json`
 - Learning stats JSON: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn stats --json`
 - Archived list: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn list --status archived`
 

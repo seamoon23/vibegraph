@@ -224,7 +224,7 @@ Java 레거시(1.6~1.8) + Spring + MyBatis + Oracle/MariaDB/Cubrid + Tomcat/JEUS
 SKILL_CONTENT = """\
 ---
 description: VibeGraph 바이브코딩 채점 + Domain Learning Card 관리. start/report/end/list/dashboard/growth/coach/learn 지원.
-argument-hint: start <project> <task> | report | end | list | dashboard | growth | coach | learn <list|add|show|next|done|archive|reopen|add-reference|export|report|stats>
+argument-hint: start <project> <task> | report | end | list | dashboard | growth | coach | learn <list|add|show|next|quiz|done|archive|reopen|add-reference|export|report|stats>
 allowed-tools: [PowerShell, Read, Write]
 ---
 
@@ -263,6 +263,8 @@ $env:PYTHONUTF8 = "1"; vibe $ARGUMENTS
 - 다음 카드 보기: `vibe learn next`
 - 다음 카드 JSON: `vibe learn next --json`
 - 기준일 다음 카드 JSON: `vibe learn next --as-of 2026-07-01 --json`
+- 셀프체크 퀴즈: `vibe learn quiz --limit 3`
+- 셀프체크 퀴즈 JSON: `vibe learn quiz --limit 3 --json`
 - 완료 처리: `vibe learn done <id>`
 - 보관 처리: `vibe learn archive <id>`
 - 복습일 설정: `vibe learn schedule <id> --date 2026-07-01`
@@ -833,14 +835,7 @@ def generate_index_html(items: list, learning=None) -> str:
         domain_chips = '<span class="muted">아직 도메인 학습 데이터가 없습니다.</span>'
     review_rows = ""
     for card in learning.get("review_candidates", [])[:5]:
-        show_cmd = f"vibe learn show {card.get('id', '')}"
-        archive_cmd = f"vibe learn archive {card.get('id', '')}"
-        review_rows += f"""
-      <div class="learn-item">
-        <div><b>{_esc(card.get('title', ''))}</b><span>{_esc(card.get('domain', 'Etc'))} · {_esc(card.get('type', 'domain_gap'))} · severity {card.get('severity', 0)}</span></div>
-        <code>{_esc(show_cmd)}</code>
-        <code>{_esc(archive_cmd)}</code>
-      </div>"""
+        review_rows += _learning_info_html(card)
     if not review_rows:
         review_rows = '<div class="learn-empty">vibe report 또는 vibe end 후 domain_learning 신호가 생기면 여기에 복습 후보가 표시됩니다.</div>'
     learning_panel = f"""
@@ -853,6 +848,7 @@ def generate_index_html(items: list, learning=None) -> str:
       <div class="learn-actions">
         <code>vibe learn list</code>
         <code>vibe learn next</code>
+        <code>vibe learn quiz</code>
         <code>vibe learn list --status archived</code>
         <code>vibe learn export</code>
       </div>
@@ -998,6 +994,9 @@ a:hover{{text-decoration:underline}}
 .learn-item:first-of-type{{border-top:none;padding-top:0}}
 .learn-item b{{display:block;color:#f8fafc;font-size:13px}}
 .learn-item span{{display:block;color:#94a3b8;font-size:12px;margin-top:2px}}
+.learn-item p{{color:#cbd5e1;font-size:12px;margin-top:6px}}
+.learn-item strong{{color:#5eead4}}
+.learn-item ul{{margin:6px 0 0 18px;color:#cbd5e1;font-size:12px}}
 .learn-item code{{color:#99f6e4;background:#0b1120;border:1px solid #334155;border-radius:6px;padding:4px 7px;font-size:11px;white-space:nowrap}}
 .learn-empty,.muted{{color:#64748b;font-size:13px}}
 .controls{{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}}
@@ -1176,6 +1175,8 @@ def cmd_learn(args):
         cmd_learn_add_reference(args)
     elif action == "add":
         cmd_learn_add(args)
+    elif action == "quiz":
+        cmd_learn_quiz(args)
     elif action == "export":
         cmd_learn_export(args)
     elif action == "report":
@@ -1183,7 +1184,7 @@ def cmd_learn(args):
     elif action == "stats":
         cmd_learn_stats(args)
     else:
-        print("사용법: vibe learn <list|card|show|next|done|archive|reopen|add|export|report|stats>")
+        print("사용법: vibe learn <list|card|show|next|quiz|done|archive|reopen|add|export|report|stats>")
         print("접근 경로: 터미널 > vibe learn list")
 
 
@@ -1261,6 +1262,30 @@ def cmd_learn_next(args):
     print(vibe_learning.render_learning_card_md(card, refs))
     print("접근 경로: 터미널 > vibe learn next")
     print()
+
+
+def cmd_learn_quiz(args):
+    cards = vibe_learning.learning_quiz_cards(
+        ROOT,
+        limit=getattr(args, "limit", 5),
+        as_of=getattr(args, "as_of", None),
+    )
+    if getattr(args, "json", False):
+        print(json.dumps(cards, ensure_ascii=False, indent=2))
+        return
+    if not cards:
+        print("\nLearning Quiz 대상 카드가 없습니다.")
+        print("접근 경로: 터미널 > vibe learn list --due\n")
+        return
+    print("\nLearning Quiz")
+    for idx, card in enumerate(cards, 1):
+        print(f"\n{idx}. {card['title']} [{card['domain']} · severity {card['severity']}]")
+        print(f"   목표: {card['goal']}")
+        print(f"   요약: {card['summary']}")
+        for qidx, question in enumerate(card["questions"], 1):
+            print(f"   Q{qidx}. {question}")
+        print(f"   접근 경로: 터미널 > {card['show_command']}")
+    print("\n점수/기록은 저장하지 않습니다. 스스로 답한 뒤 카드 본문으로 확인하세요.\n")
 
 
 def cmd_learn_status(args, status):
@@ -1543,11 +1568,7 @@ def generate_growth_html(sig: dict, all_projects=None, sel_project=None, weeks=N
         learn_domain_rows = '<p class="empty">아직 Domain Learning 데이터가 없습니다.</p>'
     learn_review_rows = ""
     for card in learning.get("review_candidates", [])[:5]:
-        learn_review_rows += (
-            f'<div class="learn-line"><code>{_esc(card.get("id", ""))}</code>'
-            f'<span>{_esc(card.get("title", ""))}</span>'
-            f'<b>{_esc(card.get("domain", "Etc"))} · {card.get("severity", 0)}</b></div>'
-        )
+        learn_review_rows += _learning_info_html(card, compact=True)
     if not learn_review_rows:
         learn_review_rows = '<p class="empty">열린 복습 후보가 없습니다.</p>'
 
@@ -1583,6 +1604,10 @@ a{{color:#818cf8}}
 .learn-line:last-child{{border-bottom:none}}
 .learn-line code{{color:#99f6e4;background:#0b1120;border:1px solid #334155;border-radius:6px;padding:4px 7px;font-size:11px;white-space:nowrap}}
 .learn-line span{{color:#cbd5e1}}
+.learn-line span b{{display:block;color:#f8fafc;margin-bottom:3px}}
+.learn-line small{{display:block;color:#cbd5e1;font-size:12px;margin-bottom:3px}}
+.learn-line em{{display:block;color:#93c5fd;font-style:normal;font-size:12px;margin-bottom:3px}}
+.learn-line ul{{margin:3px 0 0 18px;color:#cbd5e1;font-size:12px}}
 .learn-line b{{color:#f8fafc;font-size:12px;white-space:nowrap}}
 @media(max-width:720px){{.learn-line{{grid-template-columns:1fr}}}}
 .focus{{background:#ef444415;border:1px solid #ef444440;border-radius:10px;padding:16px 18px;margin-bottom:18px}}
@@ -1638,7 +1663,7 @@ canvas{{max-height:240px}}
 
   <div class="g2" style="margin-top:18px">
     <div class="card"><h3>🧠 Domain Learning · 도메인 분포</h3>{learn_domain_rows}</div>
-    <div class="card"><h3>🧠 Domain Learning · 5분 복습 후보</h3><p class="empty"><code>vibe learn next</code> 로 다음 복습 카드를 바로 열 수 있습니다.</p>{learn_review_rows}</div>
+    <div class="card"><h3>🧠 Domain Learning · 5분 복습 후보</h3><p class="empty"><code>vibe learn next</code> 또는 <code>vibe learn quiz</code> 로 바로 복습할 수 있습니다.</p>{learn_review_rows}</div>
   </div>
 
   <div class="card" style="margin-top:18px">
@@ -1845,6 +1870,32 @@ def _esc(s: str) -> str:
             .replace("<", "&lt;")
             .replace(">", "&gt;")
             .replace('"', "&quot;"))
+
+
+def _learning_info_html(card: dict, compact: bool = False) -> str:
+    info = vibe_learning.learning_card_info(card)
+    questions = "".join(f"<li>{_esc(q)}</li>" for q in info.get("questions", [])[:2])
+    if compact:
+        return (
+            f'<div class="learn-line"><code>{_esc(info["id"])}</code>'
+            f'<span><b>{_esc(info["title"])}</b><small>{_esc(info["summary"])}</small>'
+            f'<em>{_esc(info["goal"])}</em><ul>{questions}</ul></span>'
+            f'<b>{_esc(info["domain"])} · {info["severity"]}</b></div>'
+        )
+    return f"""
+      <div class="learn-item info-card">
+        <div>
+          <b>{_esc(info["title"])}</b>
+          <span>{_esc(info["domain"])} · {_esc(info["type"])} · severity {info["severity"]}</span>
+          <p>{_esc(info["summary"])}</p>
+          <p><strong>5분 목표</strong> {_esc(info["goal"])}</p>
+          <ul>{questions}</ul>
+        </div>
+        <div>
+          <code>{_esc(info["show_command"])}</code>
+          <code>{_esc(info["archive_command"])}</code>
+        </div>
+      </div>"""
 
 
 def _date_arg(value: str) -> str:
@@ -2187,6 +2238,11 @@ def main():
     plnext = learn_sub.add_parser("next", help="다음에 볼 Learning Card 출력")
     plnext.add_argument("--as-of", type=_date_arg, help="복습 기준일 YYYY-MM-DD (기본: 오늘)")
     plnext.add_argument("--json", action="store_true", help="JSON 형식으로 출력")
+
+    plquiz = learn_sub.add_parser("quiz", help="다음 복습 카드 셀프체크 퀴즈 출력")
+    plquiz.add_argument("--limit", type=_positive_int_arg, default=5, help="최대 표시 개수")
+    plquiz.add_argument("--as-of", type=_date_arg, help="복습 기준일 YYYY-MM-DD (기본: 오늘)")
+    plquiz.add_argument("--json", action="store_true", help="JSON 형식으로 출력")
 
     pld = learn_sub.add_parser("done", help="Learning Card를 완료 처리")
     pld.add_argument("id", help="카드 ID")

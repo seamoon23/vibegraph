@@ -70,6 +70,9 @@ Branch: `feature/domain-learning-layer-mvp`
   - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn list --due --as-of 2026-07-01`
   - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn next --as-of 2026-07-01 --json`
   - Invalid `--as-of` values now fail fast unless they use `YYYY-MM-DD`.
+- Added lightweight Domain Learning info cards and self-check quiz output without score/history persistence.
+  - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn quiz --limit 3`
+  - Access path: PowerShell or Windows Terminal > `cd C:\codex\app\vibegraph` > `vibe learn quiz --limit 3 --json`
 - Invalid `vibe learn list --limit` values now fail fast unless they are positive integers.
 - Invalid `vibe learn list --severity` and `vibe learn add --severity` values now fail fast unless they are in `1-5`.
 - Aligned dashboard and growth review candidates with the same due-first priority as `vibe learn next`.

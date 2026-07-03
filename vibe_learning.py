@@ -441,6 +441,29 @@ def get_next_learning_card(root: Path, as_of: str | None = None) -> dict[str, An
     return open_cards[0] if open_cards else None
 
 
+def learning_quiz_cards(root: Path, limit: int = 5, as_of: str | None = None) -> list[dict[str, Any]]:
+    summary = learning_summary(root, as_of=as_of)
+    return [learning_card_info(card) for card in summary.get("review_candidates", [])[:limit]]
+
+
+def learning_card_info(card: dict[str, Any]) -> dict[str, Any]:
+    checkpoints = _card_checkpoints(card)
+    questions = checkpoints[:2] or ["Explain this topic in your own words before the next similar task."]
+    return {
+        "id": card.get("id", ""),
+        "domain": card.get("domain", "Etc"),
+        "type": card.get("type", "domain_gap"),
+        "title": card.get("title", ""),
+        "severity": _as_int(card.get("severity"), 3),
+        "summary": card.get("micro_summary") or card.get("evidence") or card.get("title", ""),
+        "goal": card.get("micro_goal") or "Explain this topic in five minutes before the next similar task.",
+        "questions": questions,
+        "next_review_at": card.get("next_review_at") or "",
+        "show_command": f"vibe learn show {card.get('id', '')}",
+        "archive_command": f"vibe learn archive {card.get('id', '')}",
+    }
+
+
 def create_manual_learning_card(
     root: Path,
     domain: str,
@@ -574,13 +597,7 @@ def write_session_learning_card(task_dir: Path, cards: list[dict[str, Any]], sum
 
 def render_learning_card_md(card: dict[str, Any], references: list[dict[str, str]] | None = None) -> str:
     references = references if references is not None else card.get("references", [])
-    checkpoints = card.get("self_checkpoints")
-    if not checkpoints:
-        try:
-            raw = json.loads(card.get("raw_json") or "{}")
-            checkpoints = _string_list(raw.get("self_checkpoints"))
-        except Exception:
-            checkpoints = []
+    checkpoints = _card_checkpoints(card)
 
     lines = [
         f"### {card.get('id', '')}. {card.get('title', '')}",
@@ -749,6 +766,17 @@ def _row_to_card(row: sqlite3.Row) -> dict[str, Any]:
         raw = {}
     card["self_checkpoints"] = _string_list(raw.get("self_checkpoints"))
     return card
+
+
+def _card_checkpoints(card: dict[str, Any]) -> list[str]:
+    checkpoints = _string_list(card.get("self_checkpoints"))
+    if checkpoints:
+        return checkpoints
+    try:
+        raw = json.loads(card.get("raw_json") or "{}")
+    except Exception:
+        return []
+    return _string_list(raw.get("self_checkpoints"))
 
 
 def _normalize_references(value: Any) -> list[dict[str, str]]:
