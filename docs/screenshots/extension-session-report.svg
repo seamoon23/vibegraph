@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="520" viewBox="0 0 760 520" role="img" aria-label="VibeGraph Chrome Extension session report screen">
+  <rect width="760" height="520" rx="18" fill="#f6f7fb"/>
+  <rect x="28" y="24" width="704" height="472" rx="16" fill="#ffffff" stroke="#d6dce8"/>
+  <text x="56" y="68" fill="#0f172a" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="800">VibeGraph</text>
+  <text x="56" y="96" fill="#64748b" font-family="Segoe UI, Arial, sans-serif" font-size="15">선택한 대화를 점수와 리포트로 봅니다.</text>
+  <rect x="56" y="124" width="158" height="46" rx="8" fill="#0f766e"/>
+  <text x="83" y="153" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">현재 대화 캡처</text>
+  <rect x="226" y="124" width="116" height="46" rx="8" fill="#e2e8f0"/>
+  <text x="254" y="153" fill="#334155" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">직접 입력</text>
+  <rect x="56" y="190" width="648" height="56" rx="10" fill="#e2e8f0"/>
+  <text x="103" y="224" fill="#475569" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">세션목록</text>
+  <text x="258" y="224" fill="#475569" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">대화 관리</text>
+  <rect x="378" y="196" width="158" height="44" rx="8" fill="#ffffff"/>
+  <text x="420" y="224" fill="#0f172a" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="800">개별 리포트</text>
+  <text x="586" y="224" fill="#475569" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">전체 리포트</text>
+  <rect x="56" y="270" width="648" height="86" rx="10" fill="#fffbeb" stroke="#f59e0b"/>
+  <rect x="78" y="294" width="50" height="50" rx="8" fill="#d97706"/>
+  <text x="96" y="329" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="900">C</text>
+  <text x="150" y="300" fill="#0f172a" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="900">선택 리포트</text>
+  <text x="150" y="326" fill="#475569" font-family="Segoe UI, Arial, sans-serif" font-size="14">Claude 대화를 무료 초안으로 채점했습니다.</text>
+  <text x="628" y="315" fill="#0f766e" font-family="Segoe UI, Arial, sans-serif" font-size="31" font-weight="900">58</text>
+  <text x="658" y="333" fill="#0f172a" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="900">/100</text>
+  <rect x="150" y="338" width="64" height="20" rx="10" fill="#ffffff" stroke="#dbe4ef"/>
+  <text x="165" y="353" fill="#0f172a" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="800">claude</text>
+  <rect x="224" y="338" width="82" height="20" rx="10" fill="#ffffff" stroke="#dbe4ef"/>
+  <text x="239" y="353" fill="#0f172a" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="800">메시지 4개</text>
+  <rect x="56" y="372" width="318" height="104" rx="10" fill="#fbfdff" stroke="#dbe4ef"/>
+  <text x="78" y="402" fill="#0f172a" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="900">세부 점수</text>
+  <line x1="170" y1="418" x2="328" y2="418" stroke="#e2e8f0" stroke-width="9" stroke-linecap="round"/>
+  <line x1="170" y1="418" x2="277" y2="418" stroke="#6366f1" stroke-width="9" stroke-linecap="round"/>
+  <text x="78" y="423" fill="#475569" font-family="Segoe UI, Arial, sans-serif" font-size="13">원샷 성공률</text>
+  <text x="336" y="423" fill="#0f172a" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="800">17/25</text>
+  <line x1="170" y1="446" x2="328" y2="446" stroke="#e2e8f0" stroke-width="9" stroke-linecap="round"/>
+  <line x1="170" y1="446" x2="252" y2="446" stroke="#6366f1" stroke-width="9" stroke-linecap="round"/>
+  <text x="78" y="451" fill="#475569" font-family="Segoe UI, Arial, sans-serif" font-size="13">프롬프트 선명도</text>
+  <text x="336" y="451" fill="#0f172a" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="800">11/25</text>
+  <rect x="390" y="372" width="314" height="104" rx="10" fill="#fbfdff" stroke="#dbe4ef"/>
+  <text x="412" y="402" fill="#0f172a" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="900">레이더 차트</text>
+  <polygon points="548,404 594,448 548,492 502,448" fill="#eef2ff" stroke="#c7d2fe"/>
+  <polygon points="548,418 578,448 548,476 518,448" fill="#c7d2fe" stroke="#4f46e5" stroke-width="3" opacity="0.85"/>
+  <text x="548" y="401" fill="#64748b" font-family="Segoe UI, Arial, sans-serif" font-size="11" text-anchor="middle">원샷</text>
+  <text x="599" y="451" fill="#64748b" font-family="Segoe UI, Arial, sans-serif" font-size="11">맥락</text>
+  <text x="548" y="507" fill="#64748b" font-family="Segoe UI, Arial, sans-serif" font-size="11" text-anchor="middle">제어</text>
+</svg>

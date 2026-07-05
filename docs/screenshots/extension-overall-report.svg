@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="520" viewBox="0 0 760 520" role="img" aria-label="VibeGraph Chrome Extension overall report screen">
+  <rect width="760" height="520" rx="18" fill="#f6f7fb"/>
+  <rect x="28" y="24" width="704" height="472" rx="16" fill="#ffffff" stroke="#d6dce8"/>
+  <text x="56" y="68" fill="#0f172a" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="800">VibeGraph</text>
+  <text x="56" y="96" fill="#64748b" font-family="Segoe UI, Arial, sans-serif" font-size="15">브라우저 대화 흐름을 한눈에 봅니다.</text>
+  <rect x="56" y="124" width="158" height="46" rx="8" fill="#0f766e"/>
+  <text x="83" y="153" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">현재 대화 캡처</text>
+  <rect x="226" y="124" width="116" height="46" rx="8" fill="#e2e8f0"/>
+  <text x="254" y="153" fill="#334155" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">직접 입력</text>
+  <rect x="56" y="190" width="648" height="56" rx="10" fill="#e2e8f0"/>
+  <text x="103" y="224" fill="#475569" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">세션목록</text>
+  <text x="258" y="224" fill="#475569" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">대화 관리</text>
+  <text x="420" y="224" fill="#475569" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700">개별 리포트</text>
+  <rect x="540" y="196" width="158" height="44" rx="8" fill="#ffffff"/>
+  <text x="586" y="224" fill="#0f172a" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="800">전체 리포트</text>
+  <text x="56" y="286" fill="#0f172a" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="800">전체 리포트</text>
+  <rect x="56" y="310" width="648" height="154" rx="12" fill="#0f172a"/>
+  <path d="M56 310 h648 v154 h-648 z" fill="url(#overallGradient)" opacity="0.94"/>
+  <text x="82" y="342" fill="#a7f3d0" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="900">FLOW REPORT</text>
+  <text x="82" y="374" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="900">VibeGraph 전체 흐름 리포트</text>
+  <text x="82" y="404" fill="#dbeafe" font-family="Segoe UI, Arial, sans-serif" font-size="16">가장 먼저 볼 축은 주도권 제어력입니다.</text>
+  <text x="604" y="366" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="42" font-weight="900">65</text>
+  <text x="656" y="366" fill="#cbd5e1" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="900">/100</text>
+  <rect x="82" y="424" width="590" height="11" rx="6" fill="rgba(255,255,255,0.18)"/>
+  <rect x="82" y="424" width="384" height="11" rx="6" fill="#5eead4"/>
+  <rect x="82" y="450" width="178" height="44" rx="8" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.2)"/>
+  <text x="96" y="469" fill="#bfdbfe" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="800">전체 세션</text>
+  <text x="96" y="488" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="900">10개</text>
+  <rect x="290" y="450" width="178" height="44" rx="8" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.2)"/>
+  <text x="304" y="469" fill="#bfdbfe" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="800">채점됨</text>
+  <text x="304" y="488" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="900">5개</text>
+  <rect x="498" y="450" width="174" height="44" rx="8" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.2)"/>
+  <text x="512" y="469" fill="#bfdbfe" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="800">약한 축</text>
+  <text x="512" y="488" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="900">주도권 제어력</text>
+  <defs>
+    <linearGradient id="overallGradient" x1="56" y1="310" x2="704" y2="464" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0f172a"/>
+      <stop offset="0.64" stop-color="#115e59"/>
+      <stop offset="1" stop-color="#b45309"/>
+    </linearGradient>
+  </defs>
+</svg>

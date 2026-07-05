@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "dist-tests",
+    "rootDir": "src",
+    "module": "ES2022",
+    "moduleResolution": "Bundler",
+    "types": []
+  },
+  "include": [
+    "src/chrome.d.ts",
+    "src/core/**/*.ts",
+    "src/background/**/*.ts",
+    "src/sidepanel/components/**/*.ts"
+  ],
+  "exclude": []
+}

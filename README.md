@@ -1,18 +1,21 @@
 # 🎯 VibeGraph
 
-> 바이브코딩(AI 페어 프로그래밍) 대화의 **순도**를 사후 채점하고, 성장 흐름을 추적하는 CLI
+> 바이브코딩(AI 페어 프로그래밍) 대화의 **순도**를 사후 채점하고, 성장 흐름을 추적하는 CLI + Chrome 확장 GUI
 >
 > *Score your AI-pair-programming sessions and track your growth — no API key required.*
 
 ![platform](https://img.shields.io/badge/platform-Windows-0078D6)
 ![python](https://img.shields.io/badge/python-3.9%2B-3776AB)
+![chrome](https://img.shields.io/badge/Chrome-Extension-4285F4)
 ![API key](https://img.shields.io/badge/API%20key-not%20required-success)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
 작업이 끝날 때마다 "이번 대화에서 내가 AI를 얼마나 잘 이끌었나"를 4개 항목(각 25점)으로 채점하고,
 HTML 리포트 · 조회 페이지 · 누적 성장 리포트 · 맞춤 코칭까지 만들어 줍니다.
 
-**별도 API 키·추가 결제가 필요 없습니다.** 채점은 평소 쓰던 Claude Code 창에서 이뤄집니다(Pro/Max 구독으로 커버).
+이제 Chrome 확장 GUI로 Claude, ChatGPT, Gemini 웹 대화도 바로 캡처하고, 브라우저 안에서 세션 목록 · 개별 리포트 · 전체 흐름 리포트를 볼 수 있습니다.
+
+**별도 API 키·추가 결제가 필요 없습니다.** CLI 채점은 평소 쓰던 Claude Code 창에서 이뤄지고(Pro/Max 구독으로 커버), 확장 GUI의 무료 초안은 브라우저 로컬에서 규칙 기반으로 계산됩니다.
 
 ---
 
@@ -20,6 +23,7 @@ HTML 리포트 · 조회 페이지 · 누적 성장 리포트 · 맞춤 코칭�
 - [왜 만들었나](#-왜-만들었나)
 - [특징](#-특징)
 - [스크린샷](#-스크린샷)
+- [Chrome 확장 GUI](#-chrome-확장-gui)
 - [작동 방식](#-작동-방식)
 - [요구 사항](#-요구-사항)
 - [설치](#-설치)
@@ -44,14 +48,61 @@ AI와 함께 코딩하다 보면 같은 실수를 반복합니다 — 요구사�
 - **성장 리포트** (`growth.html`) — 점수 추세, 가장 약한 항목, 반복 스멜, 프로젝트별 평균
 - **누적 코칭** (`vibe coach`) — 계산으로 추출한 신호를 근거로 한 맞춤 코칭 (억지 분석 방지)
 - **Claude Code Skill** — `/vibe report` 한 줄로 현재 대화 자동 채점·리포트 완결
+- **Chrome 확장 GUI** — Claude · ChatGPT · Gemini 대화를 클릭으로 캡처하고, 세션 목록/개별 리포트/전체 리포트를 브라우저 안에서 확인
 
 ## 📸 스크린샷
+
+### Chrome 확장 GUI
+
+| 세션 목록 | 개별 리포트 | 전체 리포트 |
+|---|---|---|
+| ![extension sessions](docs/screenshots/extension-session-list.svg) | ![extension session report](docs/screenshots/extension-session-report.svg) | ![extension overall report](docs/screenshots/extension-overall-report.svg) |
+
+> 확장 GUI는 브라우저 대화를 빠르게 기록하고 가볍게 회고하는 Lite 모드입니다. 전체 파일 기반 리포트와 장기 성장 분석은 기존 CLI가 계속 담당합니다.
+
+### CLI HTML 리포트
 
 | 개별 리포트 | 전체 조회 | 성장 리포트 |
 |---|---|---|
 | ![report](docs/screenshots/report.png) | ![dashboard](docs/screenshots/dashboard.png) | ![growth](docs/screenshots/growth.png) |
 
 > 샘플 리포트를 바로 보려면 저장소를 클론한 뒤 `sample_report.html` 을 더블클릭하세요.
+
+## 🧩 Chrome 확장 GUI
+
+브라우저에서 AI와 나눈 대화를 프로젝트 기록으로 남기고 싶을 때는 확장 GUI가 가장 빠릅니다.
+
+- 지원 사이트: Claude, ChatGPT, Gemini
+- 저장 위치: Chrome 프로필의 `chrome.storage.local`
+- 외부 전송: 없음. 사용자가 버튼을 누른 대화만 로컬에 저장
+- 화면 구성: `세션목록` / `대화 관리` / `개별 리포트` / `전체 리포트`
+- 평가 방식: 직접 입력, 무료 초안, AI 평가 프롬프트 복사 후 결과 붙여넣기
+
+### 확장 설치
+
+개발 버전 로드는 아래 경로로 진행합니다.
+
+```powershell
+cd C:\codex\app\vibegraph\extension
+npm install
+npm run build
+```
+
+Chrome 접근 경로:
+
+1. Chrome 주소창 > `chrome://extensions`
+2. 우측 상단 > `개발자 모드` 켜기
+3. 좌측 상단 > `압축해제된 확장 프로그램을 로드합니다`
+4. 폴더 선택 > `C:\codex\app\vibegraph\extension\dist`
+
+### 확장 사용
+
+1. Chrome > Claude, ChatGPT, Gemini 대화 페이지 열기
+2. Chrome 툴바 > VibeGraph 확장 아이콘 클릭
+3. 사이드 패널 > `현재 대화 캡처` 또는 `직접 입력`
+4. `대화 관리` 탭 > 제목, 프로젝트, 태그, 원문 확인 후 `수정정보 저장`
+5. `개별 리포트` 탭 > 직접 입력, 무료 초안, AI 평가 중 선택
+6. `전체 리포트` 탭 > 전체 흐름 요약과 약한 축 확인
 
 ## ⚙️ 작동 방식
 
@@ -82,11 +133,26 @@ vibe end    ──▶ report.html · index.html · growth.html 생성
 
 > ℹ️ `/vibe` 명령은 내부적으로 PowerShell을 통해 Windows의 `vibe` 명령을 호출합니다.
 
+**방식 C — Chrome 확장 GUI (브라우저 AI 대화용)**
+
+```
+[Claude / ChatGPT / Gemini 웹 대화]
+        │
+Chrome 툴바 > VibeGraph 아이콘
+        │
+현재 대화 캡처 또는 직접 입력
+        │
+세션목록 · 대화 관리 · 개별 리포트 · 전체 리포트 확인
+```
+
+방식 C는 CLI를 몰라도 바로 쓸 수 있는 GUI 흐름입니다. 긴 기간의 파일 기반 성장 분석이나 Claude Code Skill 자동화가 필요하면 CLI와 함께 사용하면 됩니다.
+
 ## 📦 요구 사항
 
 - Windows 10/11
 - Python 3.9+ ([python.org](https://www.python.org/downloads/) — 설치 시 **"Add Python to PATH"** 체크)
 - Claude Code (Pro/Max 구독)
+- Chrome 114+ 또는 Chromium 기반 브라우저 (확장 GUI 사용 시)
 
 ## 🚀 설치
 

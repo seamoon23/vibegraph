@@ -1,0 +1,17 @@
+{
+  "name": "vibegraph-extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build && node scripts/copy-manifest.mjs",
+    "typecheck": "tsc -b",
+    "test": "tsc -p tsconfig.test.json && node dist-tests/core/core.test.js && node dist-tests/core/reportFlow.test.js && node dist-tests/background/serviceWorker.test.js && node dist-tests/sidepanel/components/sidepanelComponents.test.js",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "vite": "^5.4.11"
+  }
+}
